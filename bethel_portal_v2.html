@@ -191,26 +191,6 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
 <div id="globalLoader"><div class="pulse-cross">✝</div><div class="loader-txt" id="loaderTxt">Loading...</div></div>
 <div id="toast" class="toast"></div>
 
-<!-- SETUP SCREEN -->
-<div class="fs-screen" id="setupScreen">
-  <div class="fs-card wide">
-    <div class="fs-logo"><div class="cross">✝</div><h1>Bethel Society Portal</h1><p>Connect to Google Drive Database</p></div>
-    <div style="background:var(--offwhite);border-radius:8px;padding:1.1rem 1.3rem;margin-bottom:1.4rem;">
-      <p style="font-size:0.82rem;color:#374151;font-weight:600;margin-bottom:0.75rem;">Quick Setup (one time only):</p>
-      <div style="font-size:0.78rem;color:var(--grey);line-height:2;">
-        <div>1. Create a church Gmail → open <strong>Google Sheets</strong> → new blank spreadsheet</div>
-        <div>2. <strong>Extensions → Apps Script</strong> → paste <code style="background:#F3F4F6;padding:0.1rem 0.4rem;border-radius:3px">bethel_backend.gs</code> → save</div>
-        <div>3. Run → <strong>setupSheets()</strong> → authorize</div>
-        <div>4. <strong>Deploy → New Deployment → Web App</strong> (Execute: Me | Access: Anyone)</div>
-        <div>5. Copy the Web App URL and paste below</div>
-      </div>
-    </div>
-    <div class="form-group"><label>Google Apps Script Web App URL</label><input id="setupUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec"></div>
-    <div class="err-box" id="setupErr"></div>
-    <button class="btn btn-primary btn-full" onclick="testConnection()">Test & Connect →</button>
-  </div>
-</div>
-
 <!-- REGISTER SCREEN -->
 <div class="fs-screen" id="registerScreen" style="display:none">
   <div class="fs-card wide">
@@ -272,9 +252,8 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
     <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
     <div class="divider"><span>New member?</span></div>
     <button class="btn btn-gold btn-full" onclick="showRegister()">Register as Member</button>
-    <div style="display:flex;justify-content:space-between;margin-top:0.85rem;">
+    <div style="margin-top:0.85rem;">
       <a href="bethel_society_jamdede.html" style="font-size:0.72rem;color:var(--grey);text-decoration:none;">← Back to Website</a>
-      <span style="font-size:0.72rem;color:var(--grey);cursor:pointer" onclick="resetConn()">Change connection</span>
     </div>
   </div>
 </div>
@@ -318,37 +297,20 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
 
 <script>
 // ===== CONFIG =====
-let API_URL = localStorage.getItem('bethel_api_url') || '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz84KicVkfgPPJin9n7hT_hCNh9TJxOcMZbqs3VNGQZHCD28Y0MN63f-kbqUow3Yrte/exec';
 const API_KEY = 'BethelJamdede2025!';
 let CACHE = { members:[], attendance:[], meetings:[], finances:[] };
 let currentUser = null, loginTab = 'admin', charts = {};
 
 // ===== INIT =====
-window.onload = () => { API_URL ? show('loginScreen') : show('setupScreen'); };
+window.onload = () => { show('loginScreen'); };
 
 function show(id) {
-  ['setupScreen','registerScreen','loginScreen','portal'].forEach(x => {
+  ['registerScreen','loginScreen','portal'].forEach(x => {
     const el = document.getElementById(x);
     if (!el) return;
     el.style.display = x === id ? (x === 'portal' ? 'block' : 'flex') : 'none';
   });
-}
-
-// ===== SETUP =====
-async function testConnection() {
-  const url = document.getElementById('setupUrl').value.trim();
-  const err = document.getElementById('setupErr');
-  err.style.display = 'none';
-  if (!url) { err.textContent = 'Please enter the Web App URL.'; err.style.display = 'block'; return; }
-  showLoader('Testing connection...');
-  try {
-    const res = await apiGet('ping', url);
-    if (res.success) { API_URL = url; localStorage.setItem('bethel_api_url', url); hideLoader(); show('loginScreen'); toast('Connected to Google Drive!', 'success'); }
-    else throw new Error(res.error || 'Connection failed');
-  } catch(e) { hideLoader(); err.textContent = 'Error: ' + e.message; err.style.display = 'block'; }
-}
-function resetConn() {
-  if (confirm('Reset database connection?')) { localStorage.removeItem('bethel_api_url'); API_URL = ''; show('setupScreen'); }
 }
 
 // ===== API =====
@@ -800,7 +762,6 @@ async function renderSettings(){
           <tr><td style="color:var(--grey);font-size:0.78rem">API URL</td><td style="font-size:0.75rem;word-break:break-all">${API_URL.slice(0,60)}...</td></tr>
           <tr><td style="color:var(--grey);font-size:0.78rem">Total Members</td><td style="font-size:0.82rem">${CACHE.members.filter(m=>m.role!=='admin').length}</td></tr>
         </tbody></table>
-        <button class="btn btn-grey btn-sm" style="margin-top:1rem" onclick="resetConn()">Change Database Connection</button>
       </div>
     </div>`;
   window._smsEnabled = smsConfig.enabled;
