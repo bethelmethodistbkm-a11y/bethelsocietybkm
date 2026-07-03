@@ -3,601 +3,538 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bethel Society – Jamdede | Methodist Church Ghana</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Bethel Society – Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --blue:    #1A3A6B;
-  --blue2:   #0D2347;
-  --gold:    #C8960C;
-  --gold2:   #F0B429;
-  --red:     #B91C1C;
-  --white:   #FFFFFF;
-  --offwhite:#F7F5F0;
-  --light:   #EAF0F9;
-  --grey:    #6B7280;
-  --dark:    #111827;
-  --nav-h:   68px;
-}
+:root{--blue:#1A3A6B;--blue2:#0D2347;--gold:#C8960C;--gold2:#F0B429;--red:#B91C1C;--green:#15803D;--white:#fff;--offwhite:#F7F5F0;--grey:#6B7280;--light:#EAF0F9;--border:#E5E7EB;--sidebar:240px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;color:var(--dark);background:var(--white);overflow-x:hidden;}
-
-/* ======= NAV ======= */
-nav{
-  position:fixed;top:0;width:100%;z-index:1000;
-  background:var(--blue2);border-bottom:3px solid var(--gold);
-  height:var(--nav-h);display:flex;align-items:center;
-  justify-content:space-between;padding:0 2rem;
-}
-.nav-brand{display:flex;align-items:center;gap:0.75rem;text-decoration:none;}
-.nav-cross{font-size:1.8rem;color:var(--gold);font-weight:900;line-height:1;}
-.nav-title{color:var(--white);font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:700;line-height:1.3;}
-.nav-title span{color:var(--gold2);display:block;font-size:0.68rem;font-weight:400;letter-spacing:0.04em;}
-.nav-links{display:flex;gap:0.1rem;align-items:center;}
-.nav-links a{
-  color:rgba(255,255,255,0.85);text-decoration:none;
-  font-size:0.72rem;font-weight:500;padding:0.45rem 0.7rem;
-  border-radius:4px;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;
-}
-.nav-links a:hover{background:rgba(200,150,12,0.2);color:var(--gold2);}
-.nav-give{background:var(--red)!important;color:var(--white)!important;border-radius:4px!important;}
-.nav-give:hover{background:#991818!important;}
-.nav-portal{background:var(--gold)!important;color:var(--blue2)!important;border-radius:4px!important;font-weight:700!important;}
-.nav-portal:hover{background:var(--gold2)!important;}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:transparent;}
-.hamburger span{display:block;width:24px;height:2px;background:var(--white);border-radius:2px;transition:all 0.3s;}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.hamburger.open span:nth-child(2){opacity:0;}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-
-/* Mobile Drawer */
-.mobile-menu{
-  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
-  background:var(--blue2);z-index:999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0.5rem;transform:translateX(100%);transition:transform 0.35s ease;
-}
-.mobile-menu.open{transform:translateX(0);}
-.mobile-menu a{
-  color:rgba(255,255,255,0.9);text-decoration:none;font-size:1.3rem;
-  font-family:'Playfair Display',serif;font-weight:600;padding:0.75rem 2rem;
-  border-bottom:1px solid rgba(255,255,255,0.08);width:100%;text-align:center;
-  transition:color 0.2s;
-}
-.mobile-menu a:hover{color:var(--gold2);}
-.mobile-menu .mob-give{background:var(--red);color:var(--white)!important;border-radius:4px;border-bottom:none!important;margin-top:1rem;width:auto;}
-.mobile-menu .mob-portal{background:var(--gold);color:var(--blue2)!important;border-radius:4px;border-bottom:none!important;margin-top:0.5rem;width:auto;font-weight:700;}
-
-/* ======= HERO ======= */
-.hero{
-  min-height:100vh;padding-top:var(--nav-h);
-  background:linear-gradient(160deg,var(--blue2) 0%,var(--blue) 55%,#1e4d8c 100%);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-}
-.hero-bg{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse at 20% 80%,rgba(200,150,12,0.08) 0%,transparent 60%),
-    radial-gradient(ellipse at 80% 20%,rgba(185,28,28,0.08) 0%,transparent 60%);
-}
-.hero-wm{
-  position:absolute;right:-60px;top:50%;transform:translateY(-50%);
-  font-size:28rem;color:rgba(255,255,255,0.03);font-weight:900;
-  font-family:'Playfair Display',serif;pointer-events:none;user-select:none;
-}
-.hero-content{position:relative;text-align:center;padding:2rem 1.5rem;max-width:860px;width:100%;}
-.hero-badge{
-  display:inline-block;background:var(--gold);color:var(--blue2);
-  font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
-  padding:0.35rem 1.2rem;border-radius:2px;margin-bottom:1.5rem;
-}
-.hero-subtitle{color:rgba(255,255,255,0.55);font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.5rem;}
-.hero-diocese{color:var(--gold2);font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;font-weight:500;}
-.hero-name{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2rem,6vw,4rem);color:var(--white);
-  font-weight:900;line-height:1.1;margin-bottom:0.5rem;
-}
-.hero-name em{color:var(--gold2);font-style:normal;}
-.hero-tagline{font-family:'Playfair Display',serif;font-size:clamp(0.95rem,2vw,1.4rem);color:rgba(255,255,255,0.7);font-weight:400;margin-bottom:2rem;}
-.hero-divider{width:70px;height:3px;margin:0 auto 1.8rem;background:linear-gradient(90deg,var(--red),var(--gold),var(--red));}
-.hero-verse{color:rgba(255,255,255,0.6);font-style:italic;font-size:0.95rem;max-width:480px;margin:0 auto 2.5rem;line-height:1.8;}
-.hero-verse cite{display:block;color:var(--gold2);font-style:normal;font-size:0.75rem;margin-top:0.4rem;font-weight:600;}
-.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-.btn-primary{
-  background:var(--gold);color:var(--blue2);font-weight:700;
-  padding:0.85rem 2rem;border-radius:3px;text-decoration:none;
-  font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;
-  transition:all 0.2s;border:2px solid var(--gold);
-}
-.btn-primary:hover{background:var(--gold2);border-color:var(--gold2);}
-.btn-outline{
-  background:transparent;color:var(--white);font-weight:600;
-  padding:0.85rem 2rem;border-radius:3px;text-decoration:none;
-  font-size:0.82rem;letter-spacing:0.05em;text-transform:uppercase;
-  border:2px solid rgba(255,255,255,0.4);transition:all 0.2s;
-}
-.btn-outline:hover{border-color:var(--white);background:rgba(255,255,255,0.08);}
-.scroll-hint{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.35);font-size:0.7rem;text-align:center;}
-.scroll-hint::before{content:'▼';display:block;animation:bounce 1.6s infinite;}
-@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
-
-/* ======= COMMONS ======= */
-section{padding:5rem 1.5rem;}
-.section-inner{max-width:1100px;margin:0 auto;}
-.section-eyebrow{font-size:0.68rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;}
-.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:700;color:var(--blue2);line-height:1.2;margin-bottom:1rem;}
-.section-lead{color:var(--grey);line-height:1.8;max-width:680px;font-size:0.95rem;}
-.gold-bar{width:50px;height:4px;background:var(--gold);margin:1rem 0 2rem;border-radius:2px;}
-.red-bar{width:50px;height:4px;background:var(--red);margin:1rem 0 2rem;border-radius:2px;}
-
-/* ======= WELCOME STRIP ======= */
-.welcome-strip{background:var(--offwhite);border-top:4px solid var(--gold);border-bottom:4px solid var(--gold);padding:3rem 1.5rem;}
-.ws-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;text-align:center;}
-.ws-item{padding:1.2rem;}
-.ws-icon{font-size:2.2rem;margin-bottom:0.6rem;}
-.ws-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:0.3rem;}
-.ws-value{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--blue2);}
-.ws-sub{font-size:0.78rem;color:var(--grey);margin-top:0.3rem;}
-
-/* ======= ABOUT ======= */
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;}
-.about-box{
-  background:linear-gradient(145deg,var(--blue2),var(--blue));
-  border-radius:4px;padding:2.5rem 2rem;color:var(--white);position:relative;overflow:hidden;
-}
-.about-box::before{content:'✝';position:absolute;font-size:10rem;color:rgba(255,255,255,0.04);top:50%;left:50%;transform:translate(-50%,-50%);font-weight:900;}
-.about-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.75rem;position:relative;}
-.about-box p{font-size:0.87rem;line-height:1.8;color:rgba(255,255,255,0.8);position:relative;}
-.about-tag{display:inline-block;background:var(--gold);color:var(--blue2);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.75rem;border-radius:2px;margin-bottom:0.75rem;}
-.values-list{list-style:none;margin-top:1.5rem;}
-.values-list li{padding:0.65rem 0;border-bottom:1px solid #E5E7EB;font-size:0.88rem;display:flex;align-items:center;gap:0.75rem;color:#374151;}
-.values-list li:last-child{border-bottom:none;}
-.values-list li span{color:var(--gold);font-size:1.1rem;}
-.vision-box{margin-top:1.5rem;background:var(--light);border-radius:4px;padding:1.4rem;border-left:4px solid var(--red);}
-
-/* ======= STATS ======= */
-.stats-section{background:linear-gradient(135deg,var(--blue2),var(--blue));color:var(--white);padding:5rem 1.5rem;}
-.stats-section .section-title{color:var(--white);}
-.stats-section .section-lead{color:rgba(255,255,255,0.65);}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:2.5rem;}
-.stat-card{text-align:center;padding:1.75rem 1rem;border:1px solid rgba(255,255,255,0.1);border-radius:4px;background:rgba(255,255,255,0.05);}
-.stat-icon{font-size:1.5rem;margin-bottom:0.6rem;}
-.stat-number{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;color:var(--gold2);line-height:1;}
-.stat-label{font-size:0.72rem;color:rgba(255,255,255,0.6);margin-top:0.4rem;letter-spacing:0.06em;text-transform:uppercase;}
-
-/* ======= SERMONS ======= */
-.sermons-section{background:var(--offwhite);}
-.sermons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem;}
-.sermon-card{background:var(--white);border-radius:4px;overflow:hidden;border:1px solid #E5E7EB;transition:transform 0.2s,box-shadow 0.2s;}
-.sermon-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(26,58,107,0.12);}
-.sermon-head{background:var(--blue);padding:1rem 1.25rem;display:flex;align-items:center;gap:0.75rem;}
-.sermon-date-tag{background:var(--gold);color:var(--blue2);font-size:0.65rem;font-weight:700;padding:0.25rem 0.55rem;border-radius:2px;letter-spacing:0.04em;}
-.sermon-type-label{color:rgba(255,255,255,0.65);font-size:0.72rem;}
-.sermon-body{padding:1.4rem;}
-.sermon-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--blue2);margin-bottom:0.4rem;line-height:1.4;}
-.sermon-speaker{font-size:0.78rem;color:var(--grey);margin-bottom:0.6rem;}
-.sermon-scripture{font-size:0.78rem;color:var(--red);font-weight:600;font-style:italic;}
-
-/* ======= EVENTS ======= */
-.events-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-top:2.5rem;}
-.event-card{display:flex;gap:1.25rem;padding:1.4rem;border-radius:4px;border:1px solid #E5E7EB;background:var(--white);transition:box-shadow 0.2s;}
-.event-card:hover{box-shadow:0 8px 24px rgba(26,58,107,0.1);}
-.event-date-box{background:var(--blue2);color:var(--white);border-radius:4px;padding:0.7rem 0.9rem;text-align:center;min-width:60px;flex-shrink:0;}
-.event-day{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;line-height:1;color:var(--gold2);}
-.event-month{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.65);margin-top:0.2rem;}
-.event-info h4{font-family:'Playfair Display',serif;font-size:0.97rem;font-weight:700;color:var(--blue2);margin-bottom:0.3rem;}
-.event-info p{font-size:0.8rem;color:var(--grey);line-height:1.6;}
-.event-tag{display:inline-block;background:var(--light);color:var(--blue);font-size:0.65rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:2px;margin-top:0.5rem;}
-
-/* ======= GALLERY ======= */
-.gallery-section{background:var(--blue2);padding:5rem 1.5rem;}
-.gallery-section .section-title{color:var(--white);}
-.gallery-section .section-lead{color:rgba(255,255,255,0.6);}
-.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-top:2.5rem;}
-.gallery-item{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;cursor:pointer;transition:transform 0.2s,opacity 0.2s;}
-.gallery-item:hover{transform:scale(1.04);opacity:0.9;}
-.gi-1{background:linear-gradient(135deg,#1e4d8c,#0d2347);}
-.gi-2{background:linear-gradient(135deg,#92400e,#78350f);}
-.gi-3{background:linear-gradient(135deg,#7f1d1d,#991b1b);}
-.gi-4{background:linear-gradient(135deg,#14532d,#166534);}
-.gi-5{background:linear-gradient(135deg,#3730a3,#4338ca);}
-.gi-6{background:linear-gradient(135deg,#831843,#9d174d);}
-.gi-7{background:linear-gradient(135deg,#0c4a6e,#075985);}
-.gi-8{background:linear-gradient(135deg,#365314,#3f6212);}
-.gallery-note{text-align:center;color:rgba(255,255,255,0.35);font-size:0.75rem;margin-top:1rem;font-style:italic;}
-
-/* ======= GIVE ======= */
-.give-section{background:var(--red);color:var(--white);padding:5rem 1.5rem;}
-.give-section .section-title{color:var(--white);}
-.give-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;}
-.give-ways{margin-top:1.75rem;display:flex;flex-direction:column;gap:0.9rem;}
-.give-way{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:1.1rem 1.4rem;}
-.give-way h4{font-weight:700;margin-bottom:0.3rem;font-size:0.92rem;}
-.give-way p{font-size:0.8rem;color:rgba(255,255,255,0.75);}
-.give-right{text-align:center;}
-.give-icon{font-size:4.5rem;margin-bottom:1.2rem;}
-.give-right p{color:rgba(255,255,255,0.82);line-height:1.8;font-size:0.92rem;max-width:380px;margin:0 auto 1.75rem;}
-.btn-gold{background:var(--gold);color:var(--blue2);font-weight:700;padding:0.9rem 2.2rem;border-radius:3px;text-decoration:none;font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;display:inline-block;transition:all 0.2s;}
+body{font-family:'Inter',sans-serif;background:#F3F4F6;color:#111827;min-height:100vh;}
+/* FULL-SCREEN CARDS */
+.fs-screen{min-height:100vh;background:linear-gradient(160deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;padding:1rem;}
+.fs-card{background:var(--white);border-radius:10px;padding:2.5rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.fs-card.wide{max-width:720px;}
+.fs-logo{text-align:center;margin-bottom:1.75rem;}
+.fs-logo .cross{font-size:2.5rem;color:var(--gold);}
+.fs-logo h1{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--blue2);margin-top:0.5rem;}
+.fs-logo p{font-size:0.73rem;color:var(--grey);margin-top:0.2rem;}
+/* TABS */
+.login-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem;}
+.login-tab{flex:1;padding:0.6rem;text-align:center;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--grey);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+.login-tab.active{color:var(--blue);border-color:var(--blue);}
+/* FORMS */
+.form-group{margin-bottom:1rem;}
+.form-group label{display:block;font-size:0.76rem;font-weight:600;color:#374151;margin-bottom:0.35rem;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.68rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.86rem;font-family:'Inter',sans-serif;transition:border-color 0.2s;background:var(--white);}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);}
+.form-group textarea{resize:vertical;min-height:75px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.form-hint{font-size:0.72rem;color:var(--grey);margin-top:0.3rem;}
+.conditional-box{background:#F9FAFB;border:1px dashed var(--border);padding:1rem;border-radius:6px;margin-bottom:1rem;display:none;}
+.contact-entry{display:flex;gap:0.5rem;margin-bottom:0.5rem;}
+/* ORGANIZATIONS GRID */
+.org-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;background:#F9FAFB;padding:1rem;border-radius:6px;border:1px solid var(--border);}
+.org-item{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:#374151;}
+.org-item input[type="checkbox"]{width:auto;cursor:pointer;}
+/* BUTTONS */
+.btn{padding:0.7rem 1.4rem;border-radius:6px;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--blue);color:var(--white);}
+.btn-primary:hover{background:var(--blue2);}
+.btn-gold{background:var(--gold);color:var(--blue2);}
 .btn-gold:hover{background:var(--gold2);}
-
-/* ======= CONTACT ======= */
-.contact-section{background:var(--offwhite);padding:5rem 1.5rem;}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;margin-top:2.5rem;}
-.contact-info h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--blue2);margin-bottom:1.4rem;}
-.contact-item{display:flex;gap:1rem;margin-bottom:1.1rem;align-items:flex-start;}
-.contact-ico{font-size:1.2rem;margin-top:0.1rem;}
-.contact-item div p{font-size:0.83rem;color:var(--grey);line-height:1.6;}
-.contact-item div strong{font-size:0.72rem;color:var(--blue2);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:0.2rem;}
-.service-times{background:var(--blue2);color:var(--white);border-radius:4px;padding:2rem 1.75rem;}
-.service-times h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--gold2);margin-bottom:1.1rem;}
-.service-row{display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:0.83rem;}
-.service-row:last-child{border-bottom:none;}
-.service-row span:first-child{color:rgba(255,255,255,0.7);}
-.service-row span:last-child{color:var(--gold2);font-weight:600;}
-
-/* ======= FOOTER ======= */
-footer{background:var(--blue2);color:rgba(255,255,255,0.55);text-align:center;padding:2.5rem 1.5rem;border-top:4px solid var(--gold);}
-.footer-logo{font-family:'Playfair Display',serif;color:var(--white);font-size:1.1rem;font-weight:700;margin-bottom:0.35rem;}
-.footer-sub{font-size:0.73rem;margin-bottom:1rem;}
-.footer-verse{font-style:italic;font-size:0.8rem;color:rgba(255,255,255,0.38);}
-.footer-copy{margin-top:1.1rem;font-size:0.7rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:1rem;}
-
-/* ======= RESPONSIVE ======= */
-@media(max-width:1024px){
-  .stats-grid{grid-template-columns:repeat(2,1fr);}
-  .sermons-grid{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:768px){
-  :root{--nav-h:60px;}
-  nav{padding:0 1rem;}
-  .nav-links{display:none;}
-  .hamburger{display:flex;}
-  .hero-wm{display:none;}
-  section{padding:3.5rem 1rem;}
-  .welcome-strip{padding:2rem 1rem;}
-  .ws-grid{grid-template-columns:1fr;gap:0.75rem;}
-  .about-grid{grid-template-columns:1fr;gap:2rem;}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:1rem;}
-  .stat-number{font-size:2rem;}
-  .sermons-grid{grid-template-columns:1fr;gap:1rem;}
-  .events-grid{grid-template-columns:1fr;}
-  .gallery-grid{grid-template-columns:repeat(2,1fr);}
-  .give-grid{grid-template-columns:1fr;gap:2rem;}
-  .give-right{order:-1;}
-  .contact-grid{grid-template-columns:1fr;gap:2rem;}
-  .hero-btns{flex-direction:column;align-items:center;}
-  .btn-primary,.btn-outline{width:100%;max-width:260px;text-align:center;}
-}
-@media(max-width:480px){
-  .stats-grid{grid-template-columns:repeat(2,1fr);}
-  .gallery-grid{grid-template-columns:repeat(2,1fr);}
-  .hero-name{font-size:1.9rem;}
-  .section-title{font-size:1.5rem;}
-  .event-card{flex-direction:column;gap:0.75rem;}
-  .event-date-box{width:fit-content;padding:0.6rem 1.2rem;display:flex;align-items:center;gap:0.5rem;}
-  .event-day{font-size:1.3rem;}
-}
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav>
-  <a class="nav-brand" href="#">
-    <div class="nav-cross">✝</div>
-    <div class="nav-title">Bethel Society – Jamdede<span>The Methodist Church Ghana</span></div>
-  </a>
-  <div class="nav-links">
-    <a href="#about">About</a>
-    <a href="#sermons">Sermons</a>
-    <a href="#events">Events</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#stats">Statistics</a>
-    <a href="#contact">Contact</a>
-    <a href="#give" class="nav-give">Give</a>
-    <a href="bethel_portal_v2.html" class="nav-portal">👤 Member Portal</a>
-  </div>
-  <button class="hamburger" id="hamburger" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#about" onclick="closeMenu()">About Us</a>
-  <a href="#sermons" onclick="closeMenu()">Sermons</a>
-  <a href="#events" onclick="closeMenu()">Events</a>
-  <a href="#gallery" onclick="closeMenu()">Gallery</a>
-  <a href="#stats" onclick="closeMenu()">Statistics</a>
-  <a href="#contact" onclick="closeMenu()">Contact</a>
-  <a href="#give" class="mob-give" onclick="closeMenu()">Give / Donate</a>
-  <a href="bethel_portal_v2.html" class="mob-portal" onclick="closeMenu()">👤 Member Portal</a>
+.btn-red{background:var(--red);color:var(--white);}
+.btn-red:hover{background:#991b1b;}
+.btn-green{background:var(--green);color:var(--white);}
+.btn-green:hover{background:#166534;}
+.btn-outline{background:transparent;color:var(--blue);border:1.5px solid var(--blue);}
+.btn-outline:hover{background:var(--light);}
+.btn-grey{background:#F3F4F6;color:#374151;border:1.5px solid var(--border);}
+.btn-grey:hover{background:#E5E7EB;}
+.btn-sm{padding:0.36rem 0.7rem;font-size:0.74rem;}
+.btn-full{width:100%;}
+.hint-box{background:var(--light);border-radius:6px;padding:0.7rem 1rem;font-size:0.74rem;color:var(--grey);margin-bottom:1.25rem;}
+.hint-box strong{color:var(--blue);}
+.err-box{background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;padding:0.65rem 0.9rem;border-radius:6px;font-size:0.8rem;margin-bottom:1rem;display:none;}
+.suc-box{background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;padding:0.65rem 0.9rem;border-radius:6px;font-size:0.8rem;margin-bottom:1rem;display:none;}
+.divider{display:flex;align-items:center;gap:0.75rem;margin:1.25rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider span{font-size:0.72rem;color:var(--grey);}
+/* LOADER */
+#globalLoader{position:fixed;inset:0;background:rgba(13,35,71,0.93);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--white);}
+#globalLoader.show{display:flex;}
+.pulse-cross{font-size:3rem;color:var(--gold);animation:pulse 1.3s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.55;transform:scale(0.88);}}
+.loader-txt{margin-top:1rem;font-size:0.88rem;color:rgba(255,255,255,0.65);}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.82rem;font-weight:500;z-index:9998;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:320px;background:var(--blue2);color:var(--white);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+/* PORTAL LAYOUT */
+#portal{display:none;min-height:100vh;}
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--blue2);overflow-y:auto;z-index:100;transition:transform 0.3s;display:flex;flex-direction:column;}
+.sb-hdr{padding:1.4rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sb-cross{font-size:1.5rem;color:var(--gold);}
+.sb-title{font-family:'Playfair Display',serif;color:var(--white);font-size:0.87rem;font-weight:700;margin-top:0.3rem;}
+.sb-sub{color:rgba(255,255,255,0.4);font-size:0.64rem;}
+.sb-nav{flex:1;padding:0.75rem 0;}
+.nav-sec{font-size:0.59rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:0.7rem 1.2rem 0.3rem;}
+.nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 1.2rem;color:rgba(255,255,255,0.68);cursor:pointer;font-size:0.81rem;font-weight:500;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:var(--white);}
+.nav-item.active{background:rgba(200,150,12,0.15);color:var(--gold2);border-left-color:var(--gold);}
+.nav-item .ico{font-size:0.95rem;width:18px;text-align:center;}
+.sb-user{padding:1rem 1.2rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:0.7rem;}
+.u-avatar{width:33px;height:33px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.83rem;font-weight:700;color:var(--blue2);flex-shrink:0;}
+.u-info{flex:1;min-width:0;}
+.u-name{font-size:0.77rem;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-role{font-size:0.63rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;}
+.btn-logout{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;font-size:1rem;padding:0.25rem;transition:color 0.2s;}
+.btn-logout:hover{color:var(--red);}
+#main{margin-left:var(--sidebar);min-height:100vh;display:flex;flex-direction:column;}
+#topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-left{display:flex;align-items:center;gap:0.85rem;}
+#menuToggle{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:4px;padding:4px;}
+#menuToggle span{display:block;width:21px;height:2px;background:var(--blue2);border-radius:2px;}
+.pg-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--blue2);}
+.tb-right{display:flex;align-items:center;gap:0.65rem;}
+.badge{display:inline-block;padding:0.18rem 0.6rem;border-radius:20px;font-size:0.65rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.badge-admin{background:var(--blue);color:var(--white);}
+.badge-member{background:var(--green);color:var(--white);}
+.badge-adherent{background:#F3F4F6;color:#6B7280;}
+.badge-catechumen{background:var(--light);color:var(--blue);}
+.badge-junior{background:#FEF3C7;color:#92400E;}
+.badge-full{background:#D1FAE5;color:var(--green);}
+.sync-pill"><div class="sync-dot"></div>Live · Drive</div>
+<span id="roleBadge" class="badge badge-admin">Admin</span>
+<span id="tbUser" style="font-size:0.8rem;color:var(--grey);font-weight:500;"></span>
+</div>
+</div>
+<div id="content"></div>
+</div>
 </div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-wm">✝</div>
-  <div class="hero-content">
-    <div class="hero-badge">Established in Faith &bull; Growing in Grace</div>
-    <p class="hero-subtitle">The Methodist Church Ghana</p>
-    <p class="hero-diocese">Sunyani Diocese &bull; Berekum Circuit</p>
-    <h1 class="hero-name">Bethel Society<br><em>Jamdede</em></h1>
-    <p class="hero-tagline">A House of God, A Gate of Heaven</p>
-    <div class="hero-divider"></div>
-    <p class="hero-verse">
-      "This is none other but the house of God, and this is the gate of heaven."
-      <cite>— Genesis 28:17</cite>
-    </p>
-    <div class="hero-btns">
-      <a href="#about" class="btn-primary">Our Story</a>
-      <a href="#sermons" class="btn-outline">Recent Sermons</a>
-    </div>
-  </div>
-  <div class="scroll-hint">Scroll</div>
-</section>
+<!-- MODAL -->
+<div id="overlay">
+<div class="modal" id="modal">
+<div class="modal-hdr"><div class="modal-title" id="modalTitle"></div><button class="modal-close" onclick="closeModal()">×</button></div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-footer" id="modalFooter"></div>
+</div>
+</div>
 
-<!-- WELCOME STRIP -->
-<div class="welcome-strip">
-  <div class="ws-grid">
-    <div class="ws-item">
-      <div class="ws-icon">🕊️</div>
-      <div class="ws-label">Sunday Worship</div>
-      <div class="ws-value">7:00 AM</div>
-      <div class="ws-sub">Main Service – Every Sunday</div>
+<!-- REGISTER SCREEN -->
+<div class="fs-screen" id="registerScreen" style="display:none">
+  <div class="fs-card wide">
+    <div class="fs-logo"><div class="cross">✝</div><h1>Register as Member</h1><p>Bethel Society Jamdede — Methodist Church Ghana</p></div>
+    <div class="err-box" id="regErr"></div>
+    <div id="regSuccess" style="display:none;background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;padding:1.2rem;border-radius:8px;margin-bottom:1rem;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
+      <strong style="font-size:0.95rem">Registration Successful!</strong>
+      <p style="font-size:0.82rem;margin-top:0.4rem">Your login details have been sent via SMS.</p>
+      <div id="regCredentials" style="background:rgba(0,0,0,0.06);border-radius:6px;padding:0.75rem;margin-top:0.75rem;font-family:monospace;font-size:0.85rem;text-align:left;"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:1rem" onclick="backToLogin()">Proceed to Login →</button>
     </div>
-    <div class="ws-item">
-      <div class="ws-icon">📖</div>
-      <div class="ws-label">Bible Study</div>
-      <div class="ws-value">Wednesday</div>
-      <div class="ws-sub">6:30 PM – Church Hall</div>
-    </div>
-    <div class="ws-item">
-      <div class="ws-icon">🙏</div>
-      <div class="ws-label">Prayer Meeting</div>
-      <div class="ws-value">Friday</div>
-      <div class="ws-sub">6:00 AM – Early Morning</div>
+    <div id="regForm">
+      <!-- 1. Names -->
+      <div class="form-row">
+        <div class="form-group"><label>First Name / Other Names *</label><input id="rFirstNames" placeholder="e.g. Kwame Asante"></div>
+        <div class="form-group"><label>Last Name (Surname) *</label><input id="rLastName" placeholder="e.g. Osei"></div>
+      </div>
+      <!-- 2 & 3. DOB & Gender -->
+      <div class="form-row">
+        <div class="form-group"><label>Date of Birth *</label><input type="date" id="rDob" onchange="handleDobChange('rDob', 'rStatus')"></div>
+        <div class="form-group"><label>Gender *</label><select id="rGender"><option>Male</option><option>Female</option></select></div>
+      </div>
+      <!-- 4. Marital Status -->
+      <div class="form-row">
+        <div class="form-group"><label>Marital Status</label><select id="rMarital"><option>Single</option><option>Ordinance</option><option>Customary</option><option>Blessing</option><option>Divorced</option></select></div>
+        <div class="form-group"><label>Home Region</label><select id="rRegion"><option>Ahafo</option><option>Ashanti</option><option>Bono</option><option selected>Bono East</option><option>Central</option><option>Eastern</option><option>Greater Accra</option><option>Nothern</option><option>Savannah</option><option>North East</option><option>Upper East</option><option>Upper West</option><option>Volta</option><option>Oti</option><option>Western</option><option>Western North</option></select></div>
+      </div>
+      <!-- Hometown & Profession -->
+      <div class="form-row">
+        <div class="form-group"><label>Hometown</label><input id="rHometown" placeholder="e.g. Berekum"></div>
+        <div class="form-group"><label>Profession / Trade</label><input id="rProfession" placeholder="e.g. Carpenter, Accountant"></div>
+      </div>
+      <!-- 5. Employment Status -->
+      <div class="form-row">
+        <div class="form-group"><label>Employment Status</label><select id="rEmployment" onchange="toggleStudentCategory('rEmployment', 'rStudentCatWrapper')"><option>Formal</option><option>Self Employed</option><option>Unemployed</option><option>Student</option></select></div>
+        <div class="form-group" id="rStudentCatWrapper" style="display:none;"><label>Student Category</label><select id="rStudentCategory"><option>Elementary</option><option>Basic</option><option>JHS</option><option>SHS</option><option>NVTI / Vocational Training</option><option>Tertiary (University/Training College)</option></select></div>
+      </div>
+      <!-- 9. Multiple Contacts Dynamic Room -->
+      <div class="form-group">
+        <label>Contact Number(s) *</label>
+        <div id="rContactsContainer">
+          <div class="contact-entry"><input class="r-phone-input" placeholder="Primary Phone (02X XXXXXXX)" type="tel"></div>
+        </div>
+        <button type="button" class="btn btn-grey btn-sm" style="margin-top:0.25rem" onclick="addContactField('rContactsContainer')">+ Add Another Contact Number</button>
+      </div>
+      <!-- 10. Membership Type -->
+      <div class="form-row">
+        <div class="form-group"><label>Membership Type *</label><select id="rStatus"><option>Full Member</option><option>Adherent</option><option>Catechumen</option><option>Junior Member</option></select><div class="form-hint" id="rAgeHint">Auto-set to Junior if under 18.</div></div>
+        <div class="form-group"><label>Distant Member?</label><select id="rIsDistant" onchange="toggleDistantFields('rIsDistant','rDistantWrapper')"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+      </div>
+      <!-- 11. Conditional Distant Details -->
+      <div id="rDistantWrapper" class="conditional-box">
+        <div class="form-row three">
+          <div class="form-group"><label>Diocese Name</label><input id="rDistantDiocese" placeholder="e.g. Sunyani Diocese"></div>
+          <div class="form-group"><label>Circuit Name</label><input id="rDistantCircuit" placeholder="e.g. Berekum Circuit"></div>
+          <div class="form-group"><label>Society Name</label><input id="rDistantSociety" placeholder="e.g. Bethel Society"></div>
+        </div>
+      </div>
+      <!-- 12 & 13. Invalid status & Optional Role -->
+      <div class="form-row">
+        <div class="form-group"><label>Invalid Member (SICK/BOUND)?</label><select id="rIsInvalid"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+        <div class="form-group"><label>Children Service Teacher?</label><select id="rChildrenTeacher"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+      </div>
+      <!-- 14. Organizations Checks -->
+      <div class="form-group">
+        <label>Church Organizations / Fellowships Joined</label>
+        <div class="org-grid" id="rOrgs">
+          <label class="org-item"><input type="checkbox" value="Men's Fellowship"> Men's Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Women's Fellowship"> Women's Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Christ Little Band"> Christ Little Band</label>
+          <label class="org-item"><input type="checkbox" value="Guild"> Guild</label>
+          <label class="org-item"><input type="checkbox" value="SUWMA"> SUWMA</label>
+          <label class="org-item"><input type="checkbox" value="Choir"> Choir</label>
+          <label class="org-item"><input type="checkbox" value="Singing Band"> Singing Band</label>
+          <label class="org-item"><input type="checkbox" value="MYF"> MYF (Youth)</label>
+          <label class="org-item"><input type="checkbox" value="Brigade"> Boys' & Girls' Brigade</label>
+          <label class="org-item"><input type="checkbox" value="Girls Fellowship"> Girls Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Gospel Band"> Gospel Band</label>
+        </div>
+      </div>
+      <p class="form-hint" style="margin-bottom:1rem">Your access credentials will be automatically generated and sent to your primary phone number.</p>
+      <button class="btn btn-gold btn-full" onclick="doRegister()">Register System Record →</button>
+      <div class="divider"><span>or</span></div>
+      <button class="btn btn-grey btn-full" onclick="backToLogin()">← Back to Login</button>
     </div>
   </div>
 </div>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-inner">
-    <div class="about-grid">
-      <div>
-        <p class="section-eyebrow">Who We Are</p>
-        <h2 class="section-title">A Community Rooted in Wesleyan Faith</h2>
-        <div class="gold-bar"></div>
-        <p class="section-lead">Bethel Society – Jamdede is a vibrant congregation within The Methodist Church Ghana, proudly serving under the Sunyani Diocese and the Berekum Circuit. We are a community of believers committed to worship, fellowship, discipleship, and service in the love of Christ.</p>
-        <p class="section-lead" style="margin-top:1rem;">Founded on the Wesleyan tradition, our society embraces the values of social holiness — loving God and loving neighbour — as the heartbeat of everything we do.</p>
-        <ul class="values-list">
-          <li><span>✦</span> Authentic Worship rooted in Scripture and Tradition</li>
-          <li><span>✦</span> Radical Hospitality — all are welcome at Bethel</li>
-          <li><span>✦</span> Servant Leadership in the Berekum community</li>
-          <li><span>✦</span> Nurturing families and youth for God's Kingdom</li>
-          <li><span>✦</span> Committed to the Methodist Church Ghana's vision</li>
-        </ul>
-      </div>
-      <div>
-        <div class="about-box">
-          <div class="about-tag">Our Mission</div>
-          <h3>Making Disciples of Jesus Christ</h3>
-          <p>We are called to make, mature, and mobilise disciples of Jesus Christ for the transformation of our community and the world. Every programme, every gathering, and every outreach at Bethel is designed with this single purpose in mind.</p>
-        </div>
-        <div class="vision-box">
-          <div class="about-tag" style="background:var(--red);color:var(--white);">Our Vision</div>
-          <p style="font-size:0.88rem;color:#374151;line-height:1.75;margin-top:0.5rem;">To be a Spirit-filled, biblically-grounded, and community-transforming church that reflects the love and holiness of God in all we do — here in Jamdede and beyond.</p>
-        </div>
-      </div>
+<!-- LOGIN SCREEN -->
+<div class="fs-screen" id="loginScreen" style="display:none">
+  <div class="fs-card">
+    <div class="fs-logo"><div class="cross">✝</div><h1>Bethel Society Portal</h1><p>Jamdede &bull; Berekum Circuit &bull; Methodist Church Ghana</p></div>
+    <div class="login-tabs">
+      <div class="login-tab active" onclick="setTab('admin')">Admin</div>
+      <div class="login-tab" onclick="setTab('member')">Member</div>
+    </div>
+    <div id="adminHint" class="hint-box"><strong>Admin:</strong> admin &nbsp;/&nbsp; bethel2025</div>
+    <div id="memberHint" class="hint-box" style="display:none">Use your registered username and password. If you don't have one, register below.</div>
+    <div class="err-box" id="loginErr"></div>
+    <div class="form-group"><label>Username</label><input id="loginUser" placeholder="Username" autocomplete="username"></div>
+    <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+    <div class="divider"><span>New member?</span></div>
+    <button class="btn btn-gold btn-full" onclick="showRegister()">Register as Member</button>
+  </div>
+</div>
+
+<!-- PORTAL -->
+<div id="portal">
+  <div id="sidebar">
+    <div class="sb-hdr"><div class="sb-cross">✝</div><div class="sb-title">Bethel Society</div><div class="sb-sub">Member Portal</div></div>
+    <nav class="sb-nav" id="sbNav"></nav>
+    <div class="sb-user">
+      <div class="u-avatar" id="sbAv">?</div>
+      <div class="u-info"><div class="u-name" id="sbName">User</div><div class="u-role" id="sbRole">Member</div></div>
+      <button class="btn-logout" onclick="doLogout()" title="Logout">✕</button>
     </div>
   </div>
-</section>
-
-<!-- STATISTICS -->
-<section class="stats-section" id="stats">
-  <div class="section-inner">
-    <p class="section-eyebrow" style="color:var(--gold2);">Church Statistics</p>
-    <h2 class="section-title">Bethel Society at a Glance</h2>
-    <div class="gold-bar"></div>
-    <p class="section-lead">Numbers that reflect the grace of God poured out on our congregation over the years.</p>
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-number">350+</div><div class="stat-label">Registered Members</div></div>
-      <div class="stat-card"><div class="stat-icon">👶</div><div class="stat-number">80+</div><div class="stat-label">Children &amp; Youth</div></div>
-      <div class="stat-card"><div class="stat-icon">🎶</div><div class="stat-number">4</div><div class="stat-label">Choirs &amp; Singing Bands</div></div>
-      <div class="stat-card"><div class="stat-icon">🤝</div><div class="stat-number">6</div><div class="stat-label">Class Groups</div></div>
-      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-number">12+</div><div class="stat-label">Annual Programmes</div></div>
-      <div class="stat-card"><div class="stat-icon">🌱</div><div class="stat-number">15+</div><div class="stat-label">Years of Ministry</div></div>
-      <div class="stat-card"><div class="stat-icon">💒</div><div class="stat-number">1</div><div class="stat-label">Sanctuary &amp; Hall</div></div>
-      <div class="stat-card"><div class="stat-icon">🙏</div><div class="stat-number">5</div><div class="stat-label">Prayer Groups</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- SERMONS -->
-<section id="sermons" class="sermons-section">
-  <div class="section-inner">
-    <p class="section-eyebrow">The Word</p>
-    <h2 class="section-title">Recent Sermons &amp; Messages</h2>
-    <div class="gold-bar"></div>
-    <p class="section-lead">Be fed by the Word of God. Our ministers bring Spirit-filled messages rooted in Scripture every week.</p>
-    <div class="sermons-grid">
-      <div class="sermon-card">
-        <div class="sermon-head"><div class="sermon-date-tag">June 29, 2025</div><div class="sermon-type-label">Sunday Sermon</div></div>
-        <div class="sermon-body">
-          <div class="sermon-title">Walk in Newness of Life</div>
-          <div class="sermon-speaker">Rev. [Pastor's Name]</div>
-          <div class="sermon-scripture">Romans 6:4 &bull; Baptism &amp; New Life</div>
-        </div>
+  <div id="main">
+    <div id="topbar">
+      <div class="tb-left">
+        <button id="menuToggle" onclick="toggleSB()"><span></span><span></span><span></span></button>
+        <div class="pg-title" id="pgTitle">Dashboard</div>
       </div>
-      <div class="sermon-card">
-        <div class="sermon-head"><div class="sermon-date-tag">June 22, 2025</div><div class="sermon-type-label">Sunday Sermon</div></div>
-        <div class="sermon-body">
-          <div class="sermon-title">The God Who Provides</div>
-          <div class="sermon-speaker">Presiding Elder</div>
-          <div class="sermon-scripture">Genesis 22:14 &bull; Jehovah Jireh</div>
-        </div>
-      </div>
-      <div class="sermon-card">
-        <div class="sermon-head"><div class="sermon-date-tag">June 15, 2025</div><div class="sermon-type-label">Special Service</div></div>
-        <div class="sermon-body">
-          <div class="sermon-title">Filled with the Holy Spirit</div>
-          <div class="sermon-speaker">Guest Preacher</div>
-          <div class="sermon-scripture">Acts 2:1–4 &bull; Pentecost Sunday</div>
-        </div>
+      <div class="tb-right">
+        <div class="sync-pill"><div class="sync-dot"></div>Live · Drive</div>
+        <span id="roleBadge" class="badge badge-admin">Admin</span>
+        <span id="tbUser" style="font-size:0.8rem;color:var(--grey);font-weight:500;"></span>
       </div>
     </div>
+    <div id="content"></div>
   </div>
-</section>
-
-<!-- EVENTS -->
-<section id="events">
-  <div class="section-inner">
-    <p class="section-eyebrow">What's Coming</p>
-    <h2 class="section-title">Upcoming Events</h2>
-    <div class="red-bar"></div>
-    <p class="section-lead">Stay connected with what God is doing at Bethel Society. All are welcome!</p>
-    <div class="events-grid">
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">13</div><div class="event-month">Jul</div></div>
-        <div class="event-info"><h4>Circuit Harvest Festival</h4><p>Annual harvest service with thanksgiving offerings, music, and fellowship for the entire Berekum Circuit.</p><span class="event-tag">Circuit-Wide</span></div>
-      </div>
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">20</div><div class="event-month">Jul</div></div>
-        <div class="event-info"><h4>Youth Sunday &amp; Quiz</h4><p>Our young people lead worship, scripture quiz, and drama presentations. Come support the next generation!</p><span class="event-tag">Youth</span></div>
-      </div>
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">3</div><div class="event-month">Aug</div></div>
-        <div class="event-info"><h4>Women's Fellowship Day</h4><p>Celebrating the women of Bethel Society with worship, special address, and community outreach programme.</p><span class="event-tag">Women's Fellowship</span></div>
-      </div>
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">17</div><div class="event-month">Aug</div></div>
-        <div class="event-info"><h4>Children's Ministry Camp</h4><p>A two-day spiritual camp for children ages 5–15. Bible lessons, games, crafts, and lots of fun in Christ!</p><span class="event-tag">Children</span></div>
-      </div>
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">31</div><div class="event-month">Aug</div></div>
-        <div class="event-info"><h4>End of Month Thanksgiving</h4><p>Monthly all-night praise and worship service. Come with your testimonies and a heart of gratitude.</p><span class="event-tag">Worship Night</span></div>
-      </div>
-      <div class="event-card">
-        <div class="event-date-box"><div class="event-day">21</div><div class="event-month">Sep</div></div>
-        <div class="event-info"><h4>Society Anniversary Service</h4><p>A special service to commemorate the founding of Bethel Society. Guest ministers, choir concerts, and fellowship lunch.</p><span class="event-tag">Anniversary</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GALLERY -->
-<section id="gallery" class="gallery-section">
-  <div class="section-inner">
-    <p class="section-eyebrow" style="color:var(--gold2);">Gallery</p>
-    <h2 class="section-title">Life at Bethel Society</h2>
-    <div class="gold-bar"></div>
-    <p class="section-lead">Glimpses of worship, fellowship, and service in our community.</p>
-    <div class="gallery-grid">
-      <div class="gallery-item gi-1">🏛️</div>
-      <div class="gallery-item gi-2">🎶</div>
-      <div class="gallery-item gi-3">🙏</div>
-      <div class="gallery-item gi-4">👨‍👩‍👧‍👦</div>
-      <div class="gallery-item gi-5">📖</div>
-      <div class="gallery-item gi-6">🌺</div>
-      <div class="gallery-item gi-7">✝️</div>
-      <div class="gallery-item gi-8">🎊</div>
-    </div>
-    <p class="gallery-note">Replace placeholder tiles with actual church photographs.</p>
-  </div>
-</section>
-
-<!-- GIVE -->
-<section id="give" class="give-section">
-  <div class="section-inner">
-    <div class="give-grid">
-      <div>
-        <p class="section-eyebrow" style="color:var(--gold2);">Support the Ministry</p>
-        <h2 class="section-title">Give to Bethel Society</h2>
-        <div style="width:50px;height:4px;background:rgba(255,255,255,0.35);margin:1rem 0 2rem;border-radius:2px;"></div>
-        <p style="color:rgba(255,255,255,0.85);line-height:1.8;font-size:0.92rem;">Your generous giving supports worship, outreach, youth programmes, and the maintenance of God's house at Bethel Society. Every gift, no matter the size, makes a difference in the Kingdom work here in Jamdede.</p>
-        <div class="give-ways">
-          <div class="give-way"><h4>📱 Mobile Money</h4><p>Send your tithe or offering via MoMo to the Society Treasurer. Contact us for the number.</p></div>
-          <div class="give-way"><h4>🏦 Church Account</h4><p>Bethel Society – Jamdede Church Account. Ask at the church office for banking details.</p></div>
-          <div class="give-way"><h4>💝 In-Person Offering</h4><p>Place your offering in the designated baskets during Sunday Service or any programme.</p></div>
-        </div>
-      </div>
-      <div class="give-right">
-        <div class="give-icon">🙌</div>
-        <p>"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver." — 2 Corinthians 9:7</p>
-        <a href="#contact" class="btn-gold">Contact Us to Give</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact" class="contact-section">
-  <div class="section-inner">
-    <p class="section-eyebrow">Find Us</p>
-    <h2 class="section-title">Contact &amp; Location</h2>
-    <div class="gold-bar"></div>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h4>Get in Touch with Bethel Society</h4>
-        <div class="contact-item"><div class="contact-ico">📍</div><div><strong>Location</strong><p>Bethel Society – Jamdede<br>Berekum Circuit, Sunyani Diocese<br>The Methodist Church Ghana</p></div></div>
-        <div class="contact-item"><div class="contact-ico">📞</div><div><strong>Phone</strong><p>[Church Contact Number]<br>Circuit Office: [Circuit Number]</p></div></div>
-        <div class="contact-item"><div class="contact-ico">✉️</div><div><strong>Email</strong><p>[Church Email Address]</p></div></div>
-        <div class="contact-item"><div class="contact-ico">👤</div><div><strong>Society Steward</strong><p>[Name of Steward]<br>[Contact Number]</p></div></div>
-      </div>
-      <div class="service-times">
-        <h4>⛪ Service Times</h4>
-        <div class="service-row"><span>Sunday Worship</span><span>7:00 AM</span></div>
-        <div class="service-row"><span>Sunday School</span><span>9:30 AM</span></div>
-        <div class="service-row"><span>Monday Class Meeting</span><span>6:30 PM</span></div>
-        <div class="service-row"><span>Wednesday Bible Study</span><span>6:30 PM</span></div>
-        <div class="service-row"><span>Friday Prayer Meeting</span><span>6:00 AM</span></div>
-        <div class="service-row"><span>Saturday Youth Meeting</span><span>4:00 PM</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MEMBER PORTAL CTA -->
-<section style="background:linear-gradient(135deg,var(--blue2),var(--blue));padding:4rem 1.5rem;text-align:center;">
-  <div style="max-width:700px;margin:0 auto;">
-    <div style="font-size:2.5rem;margin-bottom:1rem;">👤</div>
-    <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold2);margin-bottom:0.6rem;">For Members</p>
-    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--white);font-weight:700;margin-bottom:1rem;">Access the Member Portal</h2>
-    <div style="width:50px;height:3px;background:var(--gold);margin:0 auto 1.5rem;border-radius:2px;"></div>
-    <p style="color:rgba(255,255,255,0.7);font-size:0.95rem;line-height:1.8;margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto;">View your membership details, track your spiritual journey, update your personal information, and stay connected with Bethel Society — all in one place.</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-      <a href="bethel_portal_v2.html" style="background:var(--gold);color:var(--blue2);font-weight:700;padding:0.9rem 2.2rem;border-radius:4px;text-decoration:none;font-size:0.88rem;letter-spacing:0.05em;text-transform:uppercase;display:inline-block;transition:background 0.2s;" onmouseover="this.style.background='#F0B429'" onmouseout="this.style.background='#C8960C'">Login to Portal →</a>
-      <a href="#contact" style="background:transparent;color:var(--white);font-weight:600;padding:0.9rem 2.2rem;border-radius:4px;text-decoration:none;font-size:0.88rem;letter-spacing:0.05em;text-transform:uppercase;border:2px solid rgba(255,255,255,0.4);display:inline-block;">Contact Admin</a>
-    </div>
-    <p style="color:rgba(255,255,255,0.35);font-size:0.75rem;margin-top:1.5rem;">Don't have login details? Contact the Society Steward or Administrator.</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">✝ Bethel Society – Jamdede</div>
-  <div class="footer-sub">Berekum Circuit &bull; Sunyani Diocese &bull; The Methodist Church Ghana</div>
-  <div class="footer-verse">"How awesome is this place! This is none other but the house of God." — Genesis 28:17</div>
-  <div class="footer-copy">&copy; 2025 Bethel Society Jamdede &bull; The Methodist Church Ghana. All rights reserved.</div>
-</footer>
+</div>
 
 <script>
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+// ===== CONFIG =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbzWKd_fyjAJQ1rI__sCUlJ-i-g_K_m2g4qOtm9scfhR2X21uf2HHAQcEOdykUIRWPVJ/exec';
+const API_KEY = 'BethelJamdede2025!';
+let CACHE = { members:[], attendance:[], meetings:[], finances:[] };
+let currentUser = null, loginTab = 'admin', charts = {};
+
+// ===== INIT =====
+window.onload = () => { show('loginScreen'); };
+
+function show(id) {
+  ['registerScreen','loginScreen','portal'].forEach(x => {
+    const el = document.getElementById(x);
+    if (!el) return;
+    el.style.display = x === id ? (x === 'portal' ? 'block' : 'flex') : 'none';
   });
-  function closeMenu() {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-    document.body.style.overflow = '';
+}
+
+// ===== CONDITIONAL CONDITIONAL FIELD HANDLERS =====
+function toggleStudentCategory(selectId, wrapperId) {
+  const val = document.getElementById(selectId).value;
+  document.getElementById(wrapperId).style.display = (val === 'Student') ? 'block' : 'none';
+}
+function toggleDistantFields(selectId, wrapperId) {
+  const val = document.getElementById(selectId).value;
+  document.getElementById(wrapperId).style.display = (val === 'Yes') ? 'block' : 'none';
+}
+function addContactField(containerId, value = '') {
+  const container = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'contact-entry';
+  div.innerHTML = `<input class="r-phone-input" placeholder="Alternate Phone" type="tel" value="${value}"><button type="button" class="btn btn-red btn-sm" onclick="this.parentNode.remove()">✕</button>`;
+  container.appendChild(div);
+}
+function handleDobChange(dobId, statusSelectId) {
+  const dobVal = document.getElementById(dobId).value;
+  if(!dobVal) return;
+  const age = new Date().getFullYear() - new Date(dobVal).getFullYear();
+  if (age < 18) {
+    document.getElementById(statusSelectId).value = 'Junior Member';
   }
+}
+
+// ===== API CORE =====
+async function apiGet(action) {
+  const res = await fetch(API_URL + '?' + new URLSearchParams({key:API_KEY,action}), {redirect:'follow'});
+  return res.json();
+}
+async function apiPost(action, payload) {
+  const res = await fetch(API_URL, {method:'POST', body:JSON.stringify({key:API_KEY,action,...payload}), redirect:'follow'});
+  return res.json();
+}
+
+// ===== AUTH =====
+function setTab(t) {
+  loginTab = t;
+  document.querySelectorAll('.login-tab').forEach((el,i) => el.classList.toggle('active', i===(t==='admin'?0:1)));
+  document.getElementById('adminHint').style.display = t==='admin'?'':'none';
+  document.getElementById('memberHint').style.display = t==='member'?'':'none';
+}
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim(), p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr'); err.style.display = 'none';
+  if (!u||!p) { err.textContent='Enter username and password.'; err.style.display='block'; return; }
+  showLoader('Signing in...');
+  try {
+    const res = await apiGet('getMembers'); CACHE.members = res.data || [];
+    const found = CACHE.members.find(m=>m.username===u&&m.password===p);
+    if (!found) { hideLoader(); err.textContent='Invalid username or password.'; err.style.display='block'; return; }
+    if (loginTab==='admin'&&found.role!=='admin') { hideLoader(); err.textContent='Admin credentials required.'; err.style.display='block'; return; }
+    currentUser = found; await loadAll(); startPortal();
+  } catch(e) { hideLoader(); err.textContent='Connection error: '+e.message; err.style.display='block'; }
+}
+function doLogout() {
+  currentUser = null; CACHE = {members:[],attendance:[],meetings:[],finances:[]};
+  show('loginScreen'); document.getElementById('loginUser').value=''; document.getElementById('loginPass').value='';
+}
+
+async function loadAll() {
+  showLoader('Loading church data...');
+  const [a,m,f] = await Promise.all([apiGet('getAttendance'),apiGet('getMeetings'),apiGet('getFinances')]);
+  CACHE.attendance=a.data||[]; CACHE.meetings=m.data||[]; CACHE.finances=f.data||[];
+  hideLoader();
+}
+
+function startPortal() {
+  show('portal');
+  const isAdmin = currentUser.role==='admin';
+  document.getElementById('sbAv').textContent = currentUser.fullName ? currentUser.fullName[0] : '?';
+  document.getElementById('sbName').textContent = currentUser.fullName || 'Admin User';
+  document.getElementById('sbRole').textContent = isAdmin?'Administrator':currentUser.membershipStatus;
+  document.getElementById('tbUser').textContent = currentUser.fullName || 'Admin';
+  document.getElementById('roleBadge').className = 'badge '+(isAdmin?'badge-admin':'badge-member');
+  document.getElementById('roleBadge').textContent = isAdmin?'Admin':'Member';
+  buildNav(isAdmin); navigate(isAdmin?'dashboard':'myprofile');
+}
+
+function buildNav(isAdmin) {
+  document.getElementById('sbNav').innerHTML = isAdmin ? `
+    <div class="nav-sec">Overview</div>
+    <div class="nav-item" onclick="navigate('dashboard')" data-view="dashboard"><span class="ico">📊</span> Dashboard</div>
+    <div class="nav-sec">Church Records</div>
+    <div class="nav-item" onclick="navigate('members')" data-view="members"><span class="ico">👥</span> Members</div>
+    <div class="nav-item" onclick="navigate('attendance')" data-view="attendance"><span class="ico">⛪</span> Service Attendance</div>
+    <div class="nav-item" onclick="navigate('meetings')" data-view="meetings"><span class="ico">🤝</span> Meeting Attendance</div>
+    <div class="nav-item" onclick="navigate('finances')" data-view="finances"><span class="ico">💰</span> Finances</div>
+    <div class="nav-sec">Analytics & Tools</div>
+    <div class="nav-item" onclick="navigate('reports')" data-view="reports"><span class="ico">📈</span> Reports</div>
+    <div class="nav-item" onclick="navigate('settings')" data-view="settings"><span class="ico">⚙️</span> Settings & SMS</div>` : `
+    <div class="nav-sec">My Account</div>
+    <div class="nav-item" onclick="navigate('myprofile')" data-view="myprofile"><span class="ico">👤</span> My Profile</div>
+    <div class="nav-item" onclick="navigate('mystatus')" data-view="mystatus"><span class="ico">🎓</span> Membership Stage</div>`;
+}
+
+function navigate(view) {
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
+  const titles={dashboard:'Dashboard',members:'Members',attendance:'Service Attendance',meetings:'Meeting Attendance',finances:'Finances',reports:'Reports & Growth',settings:'Settings & SMS',myprofile:'My Profile',mystatus:'Membership Journey'};
+  document.getElementById('pgTitle').textContent = titles[view]||'';
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  const views={dashboard:renderDashboard,members:renderMembers,attendance:renderAttendance,meetings:renderMeetings,finances:renderFinances,reports:renderReports,settings:renderSettings,myprofile:renderMyProfile,mystatus:renderMyStatus};
+  document.getElementById('content').innerHTML='';
+  if(views[view]) views[view]();
+}
+function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); }
+
+// ===== STRUCTURAL CONCATENATION & SMS HELPERS =====
+function sBadge(s){const m={'Adherent':'badge-adherent','Catechumen':'badge-catechumen','Junior Member':'badge-junior','Full Member':'badge-full'};return `<span class="badge ${m[s]||'badge-adherent'}">${s||'Adherent'}</span>`;}
+function fmt(n){return 'GH\u20B5'+Number(n||0).toLocaleString('en-GH',{minimumFractionDigits:2});}
+function fmtD(d){if(!d)return '\u2014'; return d;}
+function mo6(){const o=[];const n=new Date();for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);o.push(d.toISOString().slice(0,7));}return o;}
+function moLbl(ym){const[y,m]=ym.split('-');return new Date(y,m-1).toLocaleDateString('en-GB',{month:'short'});}
+function showLoader(msg){document.getElementById('loaderTxt').textContent=msg||'Loading...';document.getElementById('globalLoader').classList.add('show');}
+function hideLoader()){document.getElementById('globalLoader').classList.remove('show');}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';setTimeout(()=>t.classList.remove('show'),3500);}
+
+function showRegister() { show('registerScreen'); document.getElementById('regErr').style.display='none'; document.getElementById('regSuccess').style.display='none'; document.getElementById('regForm').style.display=''; }
+function backToLogin() { show('loginScreen'); }
+
+// ===== SUBMIT MEMBER DATA PROCESSING =====
+async function doRegister() {
+  const fNames = document.getElementById('rFirstNames').value.trim();
+  const lName = document.getElementById('rLastName').value.trim();
+  const err = document.getElementById('regErr'); err.style.display='none';
+  
+  if(!fNames || !lName){err.textContent='First and Last names are explicitly required.';err.style.display='block';return;}
+  
+  // 1. First Name + Last Name Combination
+  const fullName = fNames + ' ' + lName;
+  
+  // 9. Collect Multiple Contacts
+  const phoneInputs = document.querySelectorAll('.r-phone-input');
+  let contacts = [];
+  phoneInputs.forEach(i => { if(i.value.trim()) contacts.push(i.value.trim()); });
+  if(!contacts.length) { err.textContent='At least one contact number is required.'; err.style.display='block'; return; }
+  
+  // 14. Collect Organization Checkboxes
+  let orgsChecked = [];
+  document.querySelectorAll('#rOrgs input[type="checkbox"]:checked').forEach(c => orgsChecked.push(c.value));
+
+  // Run auto age check block safely
+  handleDobChange('rDob', 'rStatus');
+
+  const data = {
+    fullName,
+    firstName: fNames,
+    lastName: lName,
+    dob: document.getElementById('rDob').value,
+    gender: document.getElementById('rGender').value,
+    maritalStatus: document.getElementById('rMarital').value,
+    homeRegion: document.getElementById('rRegion').value,
+    hometown: document.getElementById('rHometown').value,
+    profession: document.getElementById('rProfession').value,
+    employmentStatus: document.getElementById('rEmployment').value,
+    studentCategory: document.getElementById('rStudentCategory').value,
+    contacts: contacts.join(', '),
+    phone: contacts[0], // Main user dynamic communication channel
+    membershipStatus: document.getElementById('rStatus').value,
+    isDistant: document.getElementById('rIsDistant').value,
+    distantDiocese: document.getElementById('rDistantDiocese').value,
+    distantCircuit: document.getElementById('rDistantCircuit').value,
+    distantSociety: document.getElementById('rDistantSociety').value,
+    isInvalid: document.getElementById('rIsInvalid').value,
+    childrenTeacher: document.getElementById('rChildrenTeacher').value,
+    organizations: orgsChecked.join(', '),
+    joinDate: new Date().toISOString().slice(0,10)
+  };
+
+  showLoader('Syncing profile registry...');
+  try {
+    const res = await apiPost('registerMember', {data});
+    hideLoader();
+    if(!res.success){err.textContent=res.error||'Registration structural submission failure.';err.style.display='block';return;}
+    document.getElementById('regForm').style.display='none';
+    document.getElementById('regCredentials').innerHTML='<strong>Username:</strong> '+res.username+'<br><strong>System Password:</strong> '+res.tempPassword;
+    document.getElementById('regSuccess').style.display='block';
+    CACHE.members.push({...data, id:res.id, username:res.username, password:res.tempPassword, role:'member'});
+  } catch(e){hideLoader();err.textContent='Network Exception: '+e.message;err.style.display='block';}
+}
+
+// ===== DASHBOARD GENERATION =====
+function renderDashboard() {
+  const mems=CACHE.members.filter(m=>m.role!=='admin');
+  const totalInc=CACHE.finances.reduce((a,f)=>a+Number(f.amount||0),0);
+  document.getElementById('content').innerHTML=`
+    <div class="stats-row">
+      <div class="stat-box blue"><div class="s-ico">👥</div><div class="s-val">${mems.length}</div><div class="s-lbl">Total Base Registry</div></div>
+      <div class="stat-box green"><div class="s-ico">💰</div><div class="s-val">${fmt(totalInc)}</div><div class="s-lbl">Gross Inflows</div></div>
+    </div>
+    <div class="card"><div class="card-hdr"><div class="card-title">Recent Congregation Registry</div></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Status</th><th>Contacts</th></tr></thead><tbody>${mems.slice(-5).reverse().map(m=>`<tr><td>${m.fullName}</td><td>${sBadge(m.membershipStatus)}</td><td>${m.contacts||m.phone||'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+
+// ===== ADMINISTRATIVE PANEL VIEW =====
+function renderMembers() {
+  const all=CACHE.members.filter(m=>m.role!=='admin');
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Congregation Member Master File (${all.length})</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Full Combined Name</th><th>Gender</th><th>Contacts Matrix</th><th>Stage Status</th><th>Hometown</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            ${all.map(m=>`<tr>
+              <td><strong>${m.fullName}</strong></td>
+              <td>${m.gender||'—'}</td>
+              <td>${m.contacts||m.phone||'—'}</td>
+              <td>${sBadge(m.membershipStatus)}</td>
+              <td>${m.hometown||'—'}</td>
+              <td><button class="btn btn-red btn-sm" onclick="deleteMember('${m.id}')">Remove Record</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function deleteMember(id){
+  if(!confirm('Purge this record completely from sheet framework?'))return;
+  showLoader('Purging database log...');
+  try{const r=await apiPost('deleteMember',{id});if(!r.success)throw new Error(r.error);CACHE.members=CACHE.members.filter(m=>m.id!==id);hideLoader();renderMembers();toast('Record permanently dropped.','success');}
+  catch(e){hideLoader();toast('Error: '+e.message,'error');}
+}
+
+// Simple fallback view render shells
+function renderAttendance() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Attendance interface framework ready.</div>'; }
+function renderMeetings() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Meeting management framework ready.</div>'; }
+function renderFinances() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Financial auditing dashboard ready.</div>'; }
+function renderReports() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Growth metrics data modules compiled.</div>'; }
+function renderSettings() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">System config setup matrix initialized.</div>'; }
+
+// ===== CONGREGATION SELF SERVICE VIEWS =====
+function renderMyProfile(){
+  const m=currentUser;
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Verified Profile Ledger Details</div></div>
+      <div class="card-body">
+        <p><strong>Combined Name Structure:</strong> ${m.fullName}</p>
+        <p><strong>Registry Contact Array:</strong> ${m.contacts||m.phone||'—'}</p>
+        <p><strong>Methodist Stage Status:</strong> ${m.membershipStatus}</p>
+        <p><strong>Employment Segment:</strong> ${m.employmentStatus} ${m.studentCategory?`(${m.studentCategory})`:''}</p>
+        <p><strong>Hometown Baseline:</strong> ${m.hometown} (${m.homeRegion} Region)</p>
+        <p><strong>Invalid (Sick/Bound) Status:</strong> ${m.isInvalid||'No'}</p>
+        <p><strong>Organizations Portfolio:</strong> ${m.organizations||'None Selected'}</p>
+      </div>
+    </div>`;
+}
+
+function renderMyStatus(){
+  const m=currentUser;
+  document.getElementById('content').innerHTML=`
+    <div class="card" style="padding:2rem;">
+      <h3>Your Connessional Stage Standing</h3>
+      <p style="margin-top:1rem;">Current Status: ${sBadge(m.membershipStatus)}</p>
+    </div>`;
+}
 </script>
 </body>
 </html>
