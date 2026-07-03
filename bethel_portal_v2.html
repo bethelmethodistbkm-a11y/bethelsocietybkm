@@ -448,7 +448,7 @@ async function doRegister() {
     document.getElementById('regForm').style.display='none';
     document.getElementById('regCredentials').innerHTML='<strong>Username:</strong> '+res.username+'<br><strong>Temporary Password:</strong> '+res.tempPassword+(res.smsSent?'<br><br><span style="color:#065F46">✓ SMS sent to '+phone+'</span>':'<br><br><span style="color:#B91C1C">⚠ SMS could not be sent. Please note these details.</span>');
     document.getElementById('regSuccess').style.display='block';
-    CACHE.members.push({...data,id:res.id,username:res.username,password:res.tempPassword,role:'member'});
+    CACHE.members.push({...data,id:res.id,societyId:res.societyId,username:res.username,password:res.tempPassword,role:'member'});
   } catch(e){hideLoader();err.textContent='Error: '+e.message;err.style.display='block';}
 }
 
@@ -514,8 +514,9 @@ function filterMembers(){
   renderMemberTable(list);
 }
 function renderMemberTable(list){
-  document.getElementById('memberTable').innerHTML=list.length?`<table><thead><tr><th></th><th>Name</th><th>Gender</th><th>Phone</th><th>Group</th><th>Status</th><th>Joined</th><th>SMS</th><th></th></tr></thead><tbody>${list.map(m=>`<tr>
+  document.getElementById('memberTable').innerHTML=list.length?`<table><thead><tr><th></th><th>Member ID</th><th>Name</th><th>Gender</th><th>Phone</th><th>Group</th><th>Status</th><th>Joined</th><th>SMS</th><th></th></tr></thead><tbody>${list.map(m=>`<tr>
     <td>${m.photoUrl?`<img src="${m.photoUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:`<div style="width:30px;height:30px;border-radius:50%;background:var(--light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700">${m.fullName[0]}</div>`}</td>
+    <td style="font-family:monospace;font-size:0.76rem;color:var(--grey)">${m.societyId||'—'}</td>
     <td><strong>${m.fullName}</strong></td><td>${m.gender||'—'}</td><td>${m.phone||'—'}</td><td>${m.classGroup}</td>
     <td>${sBadge(m.membershipStatus)}</td><td>${fmtD(m.joinDate)}</td>
     <td>${m.phone?`<button class="btn btn-green btn-sm" onclick="sendBdaySMS('${m.id}')" title="Send Birthday SMS">🎂</button>`:'—'}</td>
@@ -530,7 +531,8 @@ async function sendBdaySMS(id) {
 function memberFormHTML(m){
   const sts=['Adherent','Catechumen','Junior Member','Full Member'];
   const grps=['Class A','Class B','Youth',"Women's Fellowship",'Choir','Admin'];
-  return `<div class="form-row"><div class="form-group"><label>Full Name *</label><input id="fN" value="${m?m.fullName:''}" placeholder="Full name"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m&&m.gender==='Male'?'selected':''}>Male</option><option ${m&&m.gender==='Female'?'selected':''}>Female</option></select></div></div>
+  return `${m&&m.societyId?`<div class="hint-box"><strong>Member ID:</strong> ${m.societyId} <span style="color:var(--grey)">(assigned automatically, Connexion format)</span></div>`:''}
+  <div class="form-row"><div class="form-group"><label>Full Name *</label><input id="fN" value="${m?m.fullName:''}" placeholder="Full name"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m&&m.gender==='Male'?'selected':''}>Male</option><option ${m&&m.gender==='Female'?'selected':''}>Female</option></select></div></div>
   <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fD" value="${m?m.dob:''}"></div><div class="form-group"><label>Phone</label><input id="fPh" value="${m?m.phone:''}" placeholder="0XX XXX XXXX"></div></div>
   <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m?m.email:''}" placeholder="Optional"></div><div class="form-group"><label>Occupation</label><input id="fO" value="${m?m.occupation:''}" placeholder="Occupation"></div></div>
   <div class="form-group"><label>Address</label><input id="fA" value="${m?m.address:''}" placeholder="Residential address"></div>
@@ -830,10 +832,11 @@ async function doManualBirthdayCheck(){
 function renderMyProfile(){
   const m=currentUser;
   document.getElementById('content').innerHTML=`
-    <div class="prof-hero">${m.photoUrl?`<img src="${m.photoUrl}" style="width:66px;height:66px;border-radius:50%;object-fit:cover;flex-shrink:0">`:`<div class="prof-av">${m.fullName[0]}</div>`}<div><div class="prof-name">${m.fullName}</div><div class="prof-sub">${m.classGroup} &bull; ${m.membershipStatus} &bull; Bethel Society Jamdede</div></div></div>
+    <div class="prof-hero">${m.photoUrl?`<img src="${m.photoUrl}" style="width:66px;height:66px;border-radius:50%;object-fit:cover;flex-shrink:0">`:`<div class="prof-av">${m.fullName[0]}</div>`}<div><div class="prof-name">${m.fullName}</div><div class="prof-sub">${m.classGroup} &bull; ${m.membershipStatus} &bull; Bethel Society Jamdede</div>${m.societyId?`<div style="font-family:monospace;font-size:0.75rem;color:rgba(255,255,255,0.55);margin-top:0.3rem">Member ID: ${m.societyId}</div>`:''}</div></div>
     <div class="two-col">
       <div class="card"><div class="card-hdr"><div class="card-title">Personal Details</div><button class="btn btn-outline btn-sm" onclick="openEditProf()">Edit</button></div><div class="card-body"><table style="table-layout:fixed"><tbody>
-        <tr><td style="color:var(--grey);font-size:0.76rem;width:40%">Full Name</td><td><strong>${m.fullName}</strong></td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem;width:40%">Member ID</td><td style="font-family:monospace">${m.societyId||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Full Name</td><td><strong>${m.fullName}</strong></td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Gender</td><td>${m.gender||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Date of Birth</td><td>${fmtD(m.dob)}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Phone</td><td>${m.phone||'—'}</td></tr>
