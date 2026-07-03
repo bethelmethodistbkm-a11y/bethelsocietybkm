@@ -205,21 +205,34 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
     </div>
     <div id="regForm">
       <div class="form-row">
-        <div class="form-group"><label>Full Name *</label><input id="rName" placeholder="e.g. Kwame Asante"></div>
-        <div class="form-group"><label>Phone Number *</label><input id="rPhone" placeholder="0XX XXX XXXX" type="tel"></div>
+        <div class="form-group"><label>Last Name *</label><input id="rLast" placeholder="e.g. Asante"></div>
+        <div class="form-group"><label>First / Other Name(s) *</label><input id="rFirst" placeholder="e.g. Kwame"></div>
       </div>
       <div class="form-row">
+        <div class="form-group"><label>Date of Birth *</label><input type="date" id="rDob" onchange="checkJuniorAge('r')"></div>
         <div class="form-group"><label>Gender</label><select id="rGender"><option>Male</option><option>Female</option></select></div>
-        <div class="form-group"><label>Date of Birth</label><input type="date" id="rDob"></div>
       </div>
       <div class="form-row">
+        <div class="form-group"><label>Marital Status</label><select id="rMarital" onchange="toggleSpouseField('r')"><option>Single</option><option>Ordinance</option><option>Customary</option><option>Blessing</option><option>Divorced</option></select></div>
+        <div class="form-group" id="rSpouseWrap"><label>Spouse's Name</label><input id="rSpouse" placeholder="Optional"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Employment Status</label><select id="rEmployment" onchange="toggleStudentLevel('r')"><option>Formal</option><option>Self Employed</option><option>Unemployed</option><option>Student</option></select></div>
+        <div class="form-group" id="rStudentLevelWrap" style="display:none"><label>Student Level</label><select id="rStudentLevel"><option>Elementary</option><option>Basic</option><option>JHS</option><option>SHS</option><option>NVTI / Vocational Training</option><option>Tertiary (University / Teacher Training / Nursing Training)</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Profession</label><input id="rOcc" placeholder="e.g. Teacher, Trader"></div>
         <div class="form-group"><label>Email</label><input type="email" id="rEmail" placeholder="Optional"></div>
-        <div class="form-group"><label>Occupation</label><input id="rOcc" placeholder="e.g. Teacher, Trader"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Home Region</label><select id="rRegion"><option value="">Select region</option><option>Ashanti</option><option>Bono</option><option>Bono East</option><option>Ahafo</option><option>Central</option><option>Eastern</option><option>Greater Accra</option><option>North East</option><option>Northern</option><option>Oti</option><option>Savannah</option><option>Upper East</option><option>Upper West</option><option>Volta</option><option>Western</option><option>Western North</option></select></div>
+        <div class="form-group"><label>Hometown</label><input id="rHometown" placeholder="e.g. Berekum"></div>
       </div>
       <div class="form-group"><label>Residential Address</label><input id="rAddr" placeholder="Your home address"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Marital Status</label><select id="rMarital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
-        <div class="form-group"><label>Spouse's Name</label><input id="rSpouse" placeholder="If married (optional)"></div>
+      <div class="form-group">
+        <label>Contact Number(s) *</label>
+        <div id="rContactsWrap"><input class="rContact" placeholder="0XX XXX XXXX (primary)" type="tel" style="margin-bottom:0.5rem"></div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="addContactField('r')">+ Add another number</button>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Ghana Card Number</label><input id="rGhanaCard" placeholder="GHA-XXXXXXXXX-X"></div>
@@ -237,9 +250,33 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
             <option>Women's Fellowship</option><option>Choir</option>
           </select>
         </div>
-        <div class="form-group"><label>Membership Status</label>
-          <select id="rStatus"><option>Adherent</option><option>Catechumen</option></select>
+        <div class="form-group"><label>Membership Type</label>
+          <select id="rStatus"><option>Full Member</option><option selected>Adherent</option><option>Catechumen</option><option>Junior Member</option></select>
+          <div class="form-hint" id="rJuniorNote" style="display:none;color:var(--red)">Automatically set to Junior Member (under 18).</div>
         </div>
+      </div>
+      <div class="form-group"><label>Organization(s) — select all that apply</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;background:var(--offwhite);border-radius:6px;padding:0.85rem 1rem;font-size:0.8rem">
+          ${['Men\'s Fellowship','Women\'s Fellowship','Christ Little Band','Guild','Susana Wesley Mission Auxiliary (SUWMA)','Choir','Singing Band','Methodist Youth Fellowship (MYF)','Boys\' and Girls\' Brigade (AMB)','Methodist Girls Fellowship','Gospel Band'].map(o=>`<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" class="rOrg" value="${o}"> ${o}</label>`).join('')}
+        </div>
+      </div>
+      <div class="form-group"><label>Member's Role (optional — can also be assigned later by admin)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;background:var(--offwhite);border-radius:6px;padding:0.85rem 1rem;font-size:0.8rem">
+          ${['Caretaker','Steward','Chapel Steward','Poor Fund Steward','Lay Preacher','Usher',"Children's Service Teacher"].map(o=>`<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" class="rRole" value="${o}"> ${o}</label>`).join('')}
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" id="rRoleLME" onchange="toggleLmePosition('r')"> Lay Movement Executive</label>
+        </div>
+        <div class="form-group" id="rLmeWrap" style="display:none;margin-top:0.5rem"><label>Lay Movement Executive Position</label><select id="rLmePosition"><option>Chairman</option><option>Vice Chairman</option><option>Secretary</option><option>Treasurer</option><option>Organizer</option><option>Co-opted Member</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Distant Member?</label><select id="rDistant" onchange="toggleDistantFields('r')"><option>No</option><option>Yes</option></select></div>
+        <div class="form-group"><label>Invalid Member?</label><select id="rInvalid"><option>No</option><option>Yes</option></select></div>
+      </div>
+      <div id="rDistantWrap" style="display:none">
+        <div class="form-row">
+          <div class="form-group"><label>Home Diocese</label><input id="rDistDiocese" placeholder="e.g. Kumasi Diocese"></div>
+          <div class="form-group"><label>Home Circuit</label><input id="rDistCircuit" placeholder="e.g. Adum Circuit"></div>
+        </div>
+        <div class="form-group"><label>Home Society</label><input id="rDistSociety" placeholder="e.g. Wesley Society"></div>
       </div>
       <p class="form-hint" style="margin-bottom:1rem">Your username and password will be generated automatically and sent to your phone number via SMS.</p>
       <button class="btn btn-gold btn-full" onclick="doRegister()">Register & Receive SMS →</button>
@@ -421,6 +458,71 @@ function showLoader(msg){document.getElementById('loaderTxt').textContent=msg||'
 function hideLoader(){document.getElementById('globalLoader').classList.remove('show');}
 function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';setTimeout(()=>t.classList.remove('show'),3500);}
 
+// ===== SHARED FORM HELPERS (age, contacts, conditional fields) =====
+function calcAge(dob){
+  if(!dob) return null;
+  const d=new Date(dob), t=new Date();
+  let age=t.getFullYear()-d.getFullYear();
+  const m=t.getMonth()-d.getMonth();
+  if(m<0||(m===0&&t.getDate()<d.getDate())) age--;
+  return age;
+}
+function checkJuniorAge(prefix){
+  const dob=document.getElementById(prefix+'Dob').value;
+  const age=calcAge(dob);
+  const statusSel=document.getElementById(prefix+'Status');
+  const note=document.getElementById(prefix+'JuniorNote');
+  if(age!==null && age<18){
+    if(statusSel) statusSel.value='Junior Member';
+    if(note) note.style.display='';
+  } else if(note) note.style.display='none';
+}
+function toggleSpouseField(prefix){
+  const val=document.getElementById(prefix+'Marital').value;
+  const wrap=document.getElementById(prefix+'SpouseWrap');
+  if(wrap) wrap.style.display = (val==='Ordinance'||val==='Customary'||val==='Blessing') ? '' : 'none';
+}
+function toggleStudentLevel(prefix){
+  const val=document.getElementById(prefix+'Employment').value;
+  const wrap=document.getElementById(prefix+'StudentLevelWrap');
+  if(wrap) wrap.style.display = val==='Student' ? '' : 'none';
+}
+function toggleLmePosition(prefix){
+  const checked=document.getElementById(prefix+'RoleLME').checked;
+  const wrap=document.getElementById(prefix+'LmeWrap');
+  if(wrap) wrap.style.display = checked ? '' : 'none';
+}
+function toggleDistantFields(prefix){
+  const val=document.getElementById(prefix+'Distant').value;
+  const wrap=document.getElementById(prefix+'DistantWrap');
+  if(wrap) wrap.style.display = val==='Yes' ? '' : 'none';
+}
+function addContactField(prefix){
+  const wrap=document.getElementById(prefix+'ContactsWrap');
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:0.5rem;margin-bottom:0.5rem';
+  row.innerHTML=`<input class="${prefix}Contact" placeholder="0XX XXX XXXX" type="tel" style="flex:1"><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem">✕</button>`;
+  wrap.appendChild(row);
+}
+function getContacts(prefix){
+  return [...document.querySelectorAll('.'+prefix+'Contact')].map(el=>el.value.trim()).filter(Boolean);
+}
+function getRoles(prefix){
+  const roles=[...document.querySelectorAll('.'+prefix+'Role:checked')].map(el=>el.value);
+  const lme=document.getElementById(prefix+'RoleLME');
+  if(lme && lme.checked) roles.push('Lay Movement Executive');
+  return roles;
+}
+function getLmePosition(prefix){
+  const lme=document.getElementById(prefix+'RoleLME');
+  if(!lme || !lme.checked) return '';
+  const pos=document.getElementById(prefix+'LmePosition');
+  return pos ? pos.value : '';
+}
+function getOrgs(prefix){
+  return [...document.querySelectorAll('.'+prefix+'Org:checked')].map(el=>el.value);
+}
+
 // ===== SELF REGISTRATION =====
 function showRegister() { show('registerScreen'); document.getElementById('regErr').style.display='none'; document.getElementById('regSuccess').style.display='none'; document.getElementById('regForm').style.display=''; }
 function backToLogin() { show('loginScreen'); }
@@ -434,19 +536,52 @@ async function uploadPhotoIfAny(fileInputId){
   return res.success ? res.url : '';
 }
 async function doRegister() {
-  const name=document.getElementById('rName').value.trim(), phone=document.getElementById('rPhone').value.trim();
+  const lastName=document.getElementById('rLast').value.trim(), firstName=document.getElementById('rFirst').value.trim();
+  const contacts=getContacts('r');
   const err=document.getElementById('regErr'); err.style.display='none';
-  if(!name){err.textContent='Full name is required.';err.style.display='block';return;}
-  if(!phone){err.textContent='Phone number is required (for SMS delivery of your login details).';err.style.display='block';return;}
+  if(!lastName||!firstName){err.textContent='Last name and first/other name(s) are required.';err.style.display='block';return;}
+  if(!contacts.length){err.textContent='At least one contact number is required (for SMS delivery of your login details).';err.style.display='block';return;}
+  const fullName = firstName + ' ' + lastName; // first name first
   showLoader('Creating your account...');
   try {
     const photoUrl = await uploadPhotoIfAny('rPhoto');
-    const data={fullName:name,phone,gender:document.getElementById('rGender').value,dob:document.getElementById('rDob').value,email:document.getElementById('rEmail').value,occupation:document.getElementById('rOcc').value,address:document.getElementById('rAddr').value,classGroup:document.getElementById('rGroup').value,membershipStatus:document.getElementById('rStatus').value,maritalStatus:document.getElementById('rMarital').value,spouseName:document.getElementById('rSpouse').value,baptismDate:document.getElementById('rBaptism').value,confirmationDate:document.getElementById('rConfirm').value,previousChurch:document.getElementById('rPrevChurch').value,ghanaCardNumber:document.getElementById('rGhanaCard').value,photoUrl};
+    const age = calcAge(document.getElementById('rDob').value);
+    const membershipStatus = (age!==null && age<18) ? 'Junior Member' : document.getElementById('rStatus').value;
+    const data={
+      fullName, lastName, firstName,
+      phone: contacts[0], additionalContacts: contacts.slice(1).join(', '),
+      gender:document.getElementById('rGender').value,
+      dob:document.getElementById('rDob').value,
+      email:document.getElementById('rEmail').value,
+      occupation:document.getElementById('rOcc').value, profession:document.getElementById('rOcc').value,
+      address:document.getElementById('rAddr').value,
+      classGroup:document.getElementById('rGroup').value,
+      membershipStatus,
+      maritalStatus:document.getElementById('rMarital').value,
+      spouseName:document.getElementById('rSpouse').value,
+      employmentStatus:document.getElementById('rEmployment').value,
+      studentLevel:document.getElementById('rEmployment').value==='Student'?document.getElementById('rStudentLevel').value:'',
+      homeRegion:document.getElementById('rRegion').value,
+      hometown:document.getElementById('rHometown').value,
+      baptismDate:document.getElementById('rBaptism').value,
+      confirmationDate:document.getElementById('rConfirm').value,
+      previousChurch:document.getElementById('rPrevChurch').value,
+      ghanaCardNumber:document.getElementById('rGhanaCard').value,
+      distantMember:document.getElementById('rDistant').value,
+      distantDiocese:document.getElementById('rDistant').value==='Yes'?document.getElementById('rDistDiocese').value:'',
+      distantCircuit:document.getElementById('rDistant').value==='Yes'?document.getElementById('rDistCircuit').value:'',
+      distantSociety:document.getElementById('rDistant').value==='Yes'?document.getElementById('rDistSociety').value:'',
+      invalidMember:document.getElementById('rInvalid').value,
+      roles:getRoles('r').join(', '),
+      layMovementPosition:getLmePosition('r'),
+      organizations:getOrgs('r').join(', '),
+      photoUrl
+    };
     const res = await apiPost('registerMember',{data});
     hideLoader();
     if(!res.success){err.textContent=res.error||'Registration failed. Try again.';err.style.display='block';return;}
     document.getElementById('regForm').style.display='none';
-    document.getElementById('regCredentials').innerHTML='<strong>Username:</strong> '+res.username+'<br><strong>Temporary Password:</strong> '+res.tempPassword+(res.smsSent?'<br><br><span style="color:#065F46">✓ SMS sent to '+phone+'</span>':'<br><br><span style="color:#B91C1C">⚠ SMS could not be sent. Please note these details.</span>');
+    document.getElementById('regCredentials').innerHTML='<strong>Username:</strong> '+res.username+'<br><strong>Temporary Password:</strong> '+res.tempPassword+(res.smsSent?'<br><br><span style="color:#065F46">✓ SMS sent to '+contacts[0]+'</span>':'<br><br><span style="color:#B91C1C">⚠ SMS could not be sent. Please note these details.</span>');
     document.getElementById('regSuccess').style.display='block';
     CACHE.members.push({...data,id:res.id,societyId:res.societyId,username:res.username,password:res.tempPassword,role:'member'});
   } catch(e){hideLoader();err.textContent='Error: '+e.message;err.style.display='block';}
@@ -529,18 +664,37 @@ async function sendBdaySMS(id) {
   catch(e){hideLoader();toast('Error: '+e.message,'error');}
 }
 function memberFormHTML(m){
-  const sts=['Adherent','Catechumen','Junior Member','Full Member'];
+  const sts=['Full Member','Adherent','Catechumen','Junior Member'];
   const grps=['Class A','Class B','Youth',"Women's Fellowship",'Choir','Admin'];
+  const orgOpts=["Men's Fellowship","Women's Fellowship",'Christ Little Band','Guild','Susana Wesley Mission Auxiliary (SUWMA)','Choir','Singing Band','Methodist Youth Fellowship (MYF)',"Boys' and Girls' Brigade (AMB)",'Methodist Girls Fellowship','Gospel Band'];
+  const roleOpts=['Caretaker','Steward','Chapel Steward','Poor Fund Steward','Lay Preacher','Usher',"Children's Service Teacher"];
+  const existingOrgs=m&&m.organizations?m.organizations.split(',').map(s=>s.trim()):[];
+  const existingRolesRaw=m&&m.roles?m.roles.split(',').map(s=>s.trim()):[];
+  const lmeExisting=existingRolesRaw.find(r=>r.indexOf('Lay Movement Executive')===0);
+  const existingRoles=existingRolesRaw.filter(r=>r.indexOf('Lay Movement Executive')!==0);
+  const contacts=m&&m.phone?[m.phone,...(m.additionalContacts?m.additionalContacts.split(',').map(s=>s.trim()).filter(Boolean):[])]:[''];
   return `${m&&m.societyId?`<div class="hint-box"><strong>Member ID:</strong> ${m.societyId} <span style="color:var(--grey)">(assigned automatically, Connexion format)</span></div>`:''}
-  <div class="form-row"><div class="form-group"><label>Full Name *</label><input id="fN" value="${m?m.fullName:''}" placeholder="Full name"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m&&m.gender==='Male'?'selected':''}>Male</option><option ${m&&m.gender==='Female'?'selected':''}>Female</option></select></div></div>
-  <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fD" value="${m?m.dob:''}"></div><div class="form-group"><label>Phone</label><input id="fPh" value="${m?m.phone:''}" placeholder="0XX XXX XXXX"></div></div>
-  <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m?m.email:''}" placeholder="Optional"></div><div class="form-group"><label>Occupation</label><input id="fO" value="${m?m.occupation:''}" placeholder="Occupation"></div></div>
+  <div class="form-row"><div class="form-group"><label>Last Name *</label><input id="fLast" value="${m?m.lastName||'':''}" placeholder="e.g. Asante"></div><div class="form-group"><label>First / Other Name(s) *</label><input id="fFirst" value="${m?m.firstName||'':''}" placeholder="e.g. Kwame"></div></div>
+  <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fDob" value="${m?m.dob:''}" onchange="checkJuniorAge('f')"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m&&m.gender==='Male'?'selected':''}>Male</option><option ${m&&m.gender==='Female'?'selected':''}>Female</option></select></div></div>
+  <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMarital" onchange="toggleSpouseField('f')"><option ${m&&m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m&&m.maritalStatus==='Ordinance'?'selected':''}>Ordinance</option><option ${m&&m.maritalStatus==='Customary'?'selected':''}>Customary</option><option ${m&&m.maritalStatus==='Blessing'?'selected':''}>Blessing</option><option ${m&&m.maritalStatus==='Divorced'?'selected':''}>Divorced</option></select></div><div class="form-group" id="fSpouseWrap"><label>Spouse's Name</label><input id="fSp" value="${m?m.spouseName||'':''}" placeholder="Optional"></div></div>
+  <div class="form-row"><div class="form-group"><label>Employment Status</label><select id="fEmployment" onchange="toggleStudentLevel('f')"><option ${m&&m.employmentStatus==='Formal'?'selected':''}>Formal</option><option ${m&&m.employmentStatus==='Self Employed'?'selected':''}>Self Employed</option><option ${m&&m.employmentStatus==='Unemployed'?'selected':''}>Unemployed</option><option ${m&&m.employmentStatus==='Student'?'selected':''}>Student</option></select></div><div class="form-group" id="fStudentLevelWrap" style="display:${m&&m.employmentStatus==='Student'?'':'none'}"><label>Student Level</label><select id="fStudentLevel"><option ${m&&m.studentLevel==='Elementary'?'selected':''}>Elementary</option><option ${m&&m.studentLevel==='Basic'?'selected':''}>Basic</option><option ${m&&m.studentLevel==='JHS'?'selected':''}>JHS</option><option ${m&&m.studentLevel==='SHS'?'selected':''}>SHS</option><option ${m&&m.studentLevel==='NVTI / Vocational Training'?'selected':''}>NVTI / Vocational Training</option><option ${m&&m.studentLevel&&m.studentLevel.indexOf('Tertiary')===0?'selected':''}>Tertiary (University / Teacher Training / Nursing Training)</option></select></div></div>
+  <div class="form-row"><div class="form-group"><label>Profession</label><input id="fO" value="${m?m.profession||m.occupation||'':''}" placeholder="e.g. Teacher, Trader"></div><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m?m.email:''}" placeholder="Optional"></div></div>
+  <div class="form-row"><div class="form-group"><label>Home Region</label><select id="fRegion"><option value="">Select region</option>${['Ashanti','Bono','Bono East','Ahafo','Central','Eastern','Greater Accra','North East','Northern','Oti','Savannah','Upper East','Upper West','Volta','Western','Western North'].map(rg=>`<option ${m&&m.homeRegion===rg?'selected':''}>${rg}</option>`).join('')}</select></div><div class="form-group"><label>Hometown</label><input id="fHometown" value="${m?m.hometown||'':''}" placeholder="e.g. Berekum"></div></div>
   <div class="form-group"><label>Address</label><input id="fA" value="${m?m.address:''}" placeholder="Residential address"></div>
-  <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMar"><option ${m&&m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m&&m.maritalStatus==='Married'?'selected':''}>Married</option><option ${m&&m.maritalStatus==='Divorced'?'selected':''}>Divorced</option><option ${m&&m.maritalStatus==='Widowed'?'selected':''}>Widowed</option></select></div><div class="form-group"><label>Spouse's Name</label><input id="fSp" value="${m?m.spouseName||'':''}" placeholder="Optional"></div></div>
+  <div class="form-group"><label>Contact Number(s)</label><div id="fContactsWrap">${contacts.map((c,i)=>i===0?`<input class="fContact" value="${c}" placeholder="0XX XXX XXXX (primary)" type="tel" style="margin-bottom:0.5rem;width:100%;padding:0.68rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.86rem">`:`<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem"><input class="fContact" value="${c}" placeholder="0XX XXX XXXX" type="tel" style="flex:1"><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem">✕</button></div>`).join('')}</div><button type="button" class="btn btn-outline btn-sm" onclick="addContactField('f')">+ Add another number</button></div>
   <div class="form-row"><div class="form-group"><label>Ghana Card Number</label><input id="fGh" value="${m?m.ghanaCardNumber||'':''}" placeholder="GHA-XXXXXXXXX-X"></div><div class="form-group"><label>Previous Church</label><input id="fPrev" value="${m?m.previousChurch||'':''}" placeholder="Optional"></div></div>
   <div class="form-row"><div class="form-group"><label>Baptism Date</label><input type="date" id="fBap" value="${m?m.baptismDate||'':''}"></div><div class="form-group"><label>Confirmation Date</label><input type="date" id="fConf" value="${m?m.confirmationDate||'':''}"></div></div>
   <div class="form-group"><label>Photo</label>${m&&m.photoUrl?`<div style="margin-bottom:0.5rem"><img src="${m.photoUrl}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border)"></div>`:''}<input type="file" id="fPhoto" accept="image/*"><div class="form-hint">${m&&m.photoUrl?'Upload a new photo to replace the current one.':'Optional'}</div></div>
-  <div class="form-row"><div class="form-group"><label>Class Group</label><select id="fGr">${grps.map(g=>`<option ${m&&m.classGroup===g?'selected':''}>${g}</option>`).join('')}</select></div><div class="form-group"><label>Membership Status</label><select id="fSt">${sts.map(s=>`<option ${m&&m.membershipStatus===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+  <div class="form-row"><div class="form-group"><label>Class Group</label><select id="fGr">${grps.map(g=>`<option ${m&&m.classGroup===g?'selected':''}>${g}</option>`).join('')}</select></div><div class="form-group"><label>Membership Type</label><select id="fSt">${sts.map(s=>`<option ${m&&m.membershipStatus===s?'selected':''}>${s}</option>`).join('')}</select><div class="form-hint" id="fJuniorNote" style="display:none;color:var(--red)">Automatically set to Junior Member (under 18).</div></div></div>
+  <div class="form-group"><label>Organization(s) — select all that apply</label><div style="display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;background:var(--offwhite);border-radius:6px;padding:0.85rem 1rem;font-size:0.8rem">${orgOpts.map(o=>`<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" class="fOrg" value="${o}" ${existingOrgs.indexOf(o)!==-1?'checked':''}> ${o}</label>`).join('')}</div></div>
+  <div class="form-group"><label>Member's Role</label><div style="display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;background:var(--offwhite);border-radius:6px;padding:0.85rem 1rem;font-size:0.8rem">${roleOpts.map(o=>`<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" class="fRole" value="${o}" ${existingRoles.indexOf(o)!==-1?'checked':''}> ${o}</label>`).join('')}<label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer"><input type="checkbox" id="fRoleLME" onchange="toggleLmePosition('f')" ${lmeExisting?'checked':''}> Lay Movement Executive</label></div>
+    <div class="form-group" id="fLmeWrap" style="display:${lmeExisting?'':'none'};margin-top:0.5rem"><label>Lay Movement Executive Position</label><select id="fLmePosition">${['Chairman','Vice Chairman','Secretary','Treasurer','Organizer','Co-opted Member'].map(p=>`<option ${m&&m.layMovementPosition===p?'selected':''}>${p}</option>`).join('')}</select></div>
+  </div>
+  <div class="form-row"><div class="form-group"><label>Distant Member?</label><select id="fDistant" onchange="toggleDistantFields('f')"><option ${(!m||m.distantMember!=='Yes')?'selected':''}>No</option><option ${m&&m.distantMember==='Yes'?'selected':''}>Yes</option></select></div><div class="form-group"><label>Invalid Member?</label><select id="fInvalid"><option ${(!m||m.invalidMember!=='Yes')?'selected':''}>No</option><option ${m&&m.invalidMember==='Yes'?'selected':''}>Yes</option></select></div></div>
+  <div id="fDistantWrap" style="display:${m&&m.distantMember==='Yes'?'':'none'}">
+    <div class="form-row"><div class="form-group"><label>Home Diocese</label><input id="fDistDiocese" value="${m?m.distantDiocese||'':''}" placeholder="e.g. Kumasi Diocese"></div><div class="form-group"><label>Home Circuit</label><input id="fDistCircuit" value="${m?m.distantCircuit||'':''}" placeholder="e.g. Adum Circuit"></div></div>
+    <div class="form-group"><label>Home Society</label><input id="fDistSociety" value="${m?m.distantSociety||'':''}" placeholder="e.g. Wesley Society"></div>
+  </div>
   <div class="form-row"><div class="form-group"><label>Date Joined</label><input type="date" id="fJ" value="${m?m.joinDate:new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label>Username *</label><input id="fU" value="${m?m.username:''}" placeholder="Login username"></div></div>
   <div class="form-group"><label>Password${m?' (blank = keep current)':' *'}</label><input type="password" id="fP" placeholder="${m?'New password (optional)':'Set password'}"></div>
   ${!m?'<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:#374151;cursor:pointer"><input type="checkbox" id="fSMS" checked> Send welcome SMS to member</label>':''}`;
@@ -548,26 +702,55 @@ function memberFormHTML(m){
 function openAddMember(){openModal('Add New Member',memberFormHTML(null),[{l:'Cancel',c:'btn-grey',a:'closeModal()'},{l:'Save Member',c:'btn-primary',a:'saveMember(null)'}]);}
 function openEditMember(id){const m=CACHE.members.find(x=>x.id===id);if(!m)return;openModal('Edit: '+m.fullName,memberFormHTML(m),[{l:'Cancel',c:'btn-grey',a:'closeModal()'},{l:'Save Changes',c:'btn-primary',a:`saveMember('${id}')`}]);}
 async function saveMember(id){
-  const name=document.getElementById('fN').value.trim(),user=document.getElementById('fU').value.trim(),pass=document.getElementById('fP').value.trim();
-  if(!name||!user){toast('Name and username are required.','error');return;}
+  const lastName=document.getElementById('fLast').value.trim(), firstName=document.getElementById('fFirst').value.trim();
+  const user=document.getElementById('fU').value.trim(),pass=document.getElementById('fP').value.trim();
+  const contacts=getContacts('f');
+  if(!lastName||!firstName||!user){toast('Last name, first name, and username are required.','error');return;}
+  const fullName = firstName + ' ' + lastName;
   showLoader(id?'Updating...':'Adding member...');
   try{
     const newPhotoUrl = await uploadPhotoIfAny('fPhoto');
-    const extraFields={maritalStatus:document.getElementById('fMar').value,spouseName:document.getElementById('fSp').value,ghanaCardNumber:document.getElementById('fGh').value,previousChurch:document.getElementById('fPrev').value,baptismDate:document.getElementById('fBap').value,confirmationDate:document.getElementById('fConf').value};
+    const dob=document.getElementById('fDob').value;
+    const age=calcAge(dob);
+    const membershipStatus = (age!==null && age<18) ? 'Junior Member' : document.getElementById('fSt').value;
+    const extraFields={
+      lastName, firstName,
+      maritalStatus:document.getElementById('fMarital').value,
+      spouseName:document.getElementById('fSp').value,
+      employmentStatus:document.getElementById('fEmployment').value,
+      studentLevel:document.getElementById('fEmployment').value==='Student'?document.getElementById('fStudentLevel').value:'',
+      profession:document.getElementById('fO').value,
+      homeRegion:document.getElementById('fRegion').value,
+      hometown:document.getElementById('fHometown').value,
+      ghanaCardNumber:document.getElementById('fGh').value,
+      previousChurch:document.getElementById('fPrev').value,
+      baptismDate:document.getElementById('fBap').value,
+      confirmationDate:document.getElementById('fConf').value,
+      distantMember:document.getElementById('fDistant').value,
+      distantDiocese:document.getElementById('fDistant').value==='Yes'?document.getElementById('fDistDiocese').value:'',
+      distantCircuit:document.getElementById('fDistant').value==='Yes'?document.getElementById('fDistCircuit').value:'',
+      distantSociety:document.getElementById('fDistant').value==='Yes'?document.getElementById('fDistSociety').value:'',
+      invalidMember:document.getElementById('fInvalid').value,
+      roles:getRoles('f').join(', '),
+      layMovementPosition:getLmePosition('f'),
+      organizations:getOrgs('f').join(', '),
+      additionalContacts:contacts.slice(1).join(', ')
+    };
     if(id){
       const ex=CACHE.members.find(m=>m.id===id);
-      const upd={...ex,fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user,...extraFields};
+      const upd={...ex,fullName,gender:document.getElementById('fG').value,dob,phone:contacts[0]||ex.phone,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus,joinDate:document.getElementById('fJ').value,username:user,...extraFields};
       if(newPhotoUrl)upd.photoUrl=newPhotoUrl;
       if(pass)upd.password=pass;
       const r=await apiPost('updateMember',{data:upd});if(!r.success)throw new Error(r.error);
       const i=CACHE.members.findIndex(m=>m.id===id);CACHE.members[i]=upd;
     }else{
       if(!pass){toast('Password required.','error');hideLoader();return;}
+      if(!contacts.length){toast('At least one contact number is required.','error');hideLoader();return;}
       const sendSMS=document.getElementById('fSMS')?.checked;
       const action=sendSMS?'registerMember':'addMember';
-      const data={fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user,password:pass,role:'member',photoUrl:newPhotoUrl,...extraFields};
+      const data={fullName,gender:document.getElementById('fG').value,dob,phone:contacts[0],email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus,joinDate:document.getElementById('fJ').value,username:user,password:pass,role:'member',photoUrl:newPhotoUrl,...extraFields};
       const r=await apiPost(action,{data});if(!r.success)throw new Error(r.error);
-      data.id=r.id;CACHE.members.push(data);
+      data.id=r.id;data.societyId=r.societyId;CACHE.members.push(data);
     }
     hideLoader();closeModal();renderMembers();toast(id?'Member updated.':'Member added.',  'success');
   }catch(e){hideLoader();toast('Error: '+e.message,'error');}
@@ -839,10 +1022,12 @@ function renderMyProfile(){
         <tr><td style="color:var(--grey);font-size:0.76rem">Full Name</td><td><strong>${m.fullName}</strong></td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Gender</td><td>${m.gender||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Date of Birth</td><td>${fmtD(m.dob)}</td></tr>
-        <tr><td style="color:var(--grey);font-size:0.76rem">Phone</td><td>${m.phone||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Phone</td><td>${[m.phone,...(m.additionalContacts?m.additionalContacts.split(',').map(s=>s.trim()).filter(Boolean):[])].filter(Boolean).join(', ')||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Email</td><td>${m.email||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Address</td><td>${m.address||'—'}</td></tr>
-        <tr><td style="color:var(--grey);font-size:0.76rem">Occupation</td><td>${m.occupation||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Profession</td><td>${m.profession||m.occupation||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Employment Status</td><td>${m.employmentStatus||'—'}${m.studentLevel?' ('+m.studentLevel+')':''}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Home Region / Town</td><td>${[m.homeRegion,m.hometown].filter(Boolean).join(' / ')||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Marital Status</td><td>${m.maritalStatus||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Spouse's Name</td><td>${m.spouseName||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Ghana Card No.</td><td>${m.ghanaCardNumber||'—'}</td></tr>
@@ -850,6 +1035,9 @@ function renderMyProfile(){
         <tr><td style="color:var(--grey);font-size:0.76rem">Baptism Date</td><td>${fmtD(m.baptismDate)}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Confirmation Date</td><td>${fmtD(m.confirmationDate)}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Class Group</td><td>${m.classGroup}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Organizations</td><td>${m.organizations||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Role(s)</td><td>${m.roles?m.roles+(m.layMovementPosition?' ('+m.layMovementPosition+')':''):'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Distant Member</td><td>${m.distantMember==='Yes'?`Yes — ${[m.distantDiocese,m.distantCircuit,m.distantSociety].filter(Boolean).join(' / ')}`:'No'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Date Joined</td><td>${fmtD(m.joinDate)}</td></tr>
       </tbody></table></div></div>
       <div class="card"><div class="card-hdr"><div class="card-title">Change Password</div></div><div class="card-body">
@@ -862,12 +1050,16 @@ function renderMyProfile(){
 }
 function openEditProf(){
   const m=currentUser;
+  const contacts=m.phone?[m.phone,...(m.additionalContacts?m.additionalContacts.split(',').map(s=>s.trim()).filter(Boolean):[])]:[''];
   openModal('Edit My Details',`
-    <div class="form-row"><div class="form-group"><label>Full Name</label><input id="fN" value="${m.fullName}"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m.gender==='Male'?'selected':''}>Male</option><option ${m.gender==='Female'?'selected':''}>Female</option></select></div></div>
-    <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fD" value="${m.dob}"></div><div class="form-group"><label>Phone</label><input id="fPh" value="${m.phone}"></div></div>
-    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m.email}"></div><div class="form-group"><label>Occupation</label><input id="fO" value="${m.occupation}"></div></div>
-    <div class="form-group"><label>Address</label><input id="fA" value="${m.address}"></div>
-    <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMar"><option ${m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m.maritalStatus==='Married'?'selected':''}>Married</option><option ${m.maritalStatus==='Divorced'?'selected':''}>Divorced</option><option ${m.maritalStatus==='Widowed'?'selected':''}>Widowed</option></select></div><div class="form-group"><label>Spouse's Name</label><input id="fSp" value="${m.spouseName||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Last Name</label><input id="fLast" value="${m.lastName||''}"></div><div class="form-group"><label>First / Other Name(s)</label><input id="fFirst" value="${m.firstName||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fDob" value="${m.dob}"></div><div class="form-group"><label>Gender</label><select id="fG"><option ${m.gender==='Male'?'selected':''}>Male</option><option ${m.gender==='Female'?'selected':''}>Female</option></select></div></div>
+    <div class="form-group"><label>Contact Number(s)</label><div id="fContactsWrap">${contacts.map((c,i)=>i===0?`<input class="fContact" value="${c}" placeholder="0XX XXX XXXX (primary)" type="tel" style="margin-bottom:0.5rem;width:100%;padding:0.68rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.86rem">`:`<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem"><input class="fContact" value="${c}" placeholder="0XX XXX XXXX" type="tel" style="flex:1"><button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem">✕</button></div>`).join('')}</div><button type="button" class="btn btn-outline btn-sm" onclick="addContactField('f')">+ Add another number</button></div>
+    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m.email||''}"></div><div class="form-group"><label>Profession</label><input id="fO" value="${m.profession||m.occupation||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Employment Status</label><select id="fEmployment" onchange="toggleStudentLevel('f')"><option ${m.employmentStatus==='Formal'?'selected':''}>Formal</option><option ${m.employmentStatus==='Self Employed'?'selected':''}>Self Employed</option><option ${m.employmentStatus==='Unemployed'?'selected':''}>Unemployed</option><option ${m.employmentStatus==='Student'?'selected':''}>Student</option></select></div><div class="form-group" id="fStudentLevelWrap" style="display:${m.employmentStatus==='Student'?'':'none'}"><label>Student Level</label><select id="fStudentLevel"><option ${m.studentLevel==='Elementary'?'selected':''}>Elementary</option><option ${m.studentLevel==='Basic'?'selected':''}>Basic</option><option ${m.studentLevel==='JHS'?'selected':''}>JHS</option><option ${m.studentLevel==='SHS'?'selected':''}>SHS</option><option ${m.studentLevel==='NVTI / Vocational Training'?'selected':''}>NVTI / Vocational Training</option><option ${m.studentLevel&&m.studentLevel.indexOf('Tertiary')===0?'selected':''}>Tertiary (University / Teacher Training / Nursing Training)</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Home Region</label><select id="fRegion"><option value="">Select region</option>${['Ashanti','Bono','Bono East','Ahafo','Central','Eastern','Greater Accra','North East','Northern','Oti','Savannah','Upper East','Upper West','Volta','Western','Western North'].map(rg=>`<option ${m.homeRegion===rg?'selected':''}>${rg}</option>`).join('')}</select></div><div class="form-group"><label>Hometown</label><input id="fHometown" value="${m.hometown||''}"></div></div>
+    <div class="form-group"><label>Address</label><input id="fA" value="${m.address||''}"></div>
+    <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMarital" onchange="toggleSpouseField('f')"><option ${m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m.maritalStatus==='Ordinance'?'selected':''}>Ordinance</option><option ${m.maritalStatus==='Customary'?'selected':''}>Customary</option><option ${m.maritalStatus==='Blessing'?'selected':''}>Blessing</option><option ${m.maritalStatus==='Divorced'?'selected':''}>Divorced</option></select></div><div class="form-group" id="fSpouseWrap"><label>Spouse's Name</label><input id="fSp" value="${m.spouseName||''}"></div></div>
     <div class="form-row"><div class="form-group"><label>Ghana Card Number</label><input id="fGh" value="${m.ghanaCardNumber||''}"></div><div class="form-group"><label>Previous Church</label><input id="fPrev" value="${m.previousChurch||''}"></div></div>
     <div class="form-group"><label>Photo</label>${m.photoUrl?`<div style="margin-bottom:0.5rem"><img src="${m.photoUrl}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border)"></div>`:''}<input type="file" id="fPhoto" accept="image/*"></div>
   `,[{l:'Cancel',c:'btn-grey',a:'closeModal()'},{l:'Save Changes',c:'btn-primary',a:'saveMyProf()'}]);
@@ -876,7 +1068,27 @@ async function saveMyProf(){
   showLoader('Saving...');
   try{
     const newPhotoUrl = await uploadPhotoIfAny('fPhoto');
-    const upd={...currentUser,fullName:document.getElementById('fN').value.trim()||currentUser.fullName,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,maritalStatus:document.getElementById('fMar').value,spouseName:document.getElementById('fSp').value,ghanaCardNumber:document.getElementById('fGh').value,previousChurch:document.getElementById('fPrev').value};
+    const contacts=getContacts('f');
+    const lastName=document.getElementById('fLast').value.trim()||currentUser.lastName||'';
+    const firstName=document.getElementById('fFirst').value.trim()||currentUser.firstName||'';
+    const upd={...currentUser,
+      fullName:(firstName&&lastName)?(firstName+' '+lastName):currentUser.fullName,
+      lastName, firstName,
+      gender:document.getElementById('fG').value,
+      dob:document.getElementById('fDob').value,
+      phone:contacts[0]||currentUser.phone, additionalContacts:contacts.slice(1).join(', '),
+      email:document.getElementById('fE').value,
+      occupation:document.getElementById('fO').value, profession:document.getElementById('fO').value,
+      employmentStatus:document.getElementById('fEmployment').value,
+      studentLevel:document.getElementById('fEmployment').value==='Student'?document.getElementById('fStudentLevel').value:'',
+      homeRegion:document.getElementById('fRegion').value,
+      hometown:document.getElementById('fHometown').value,
+      address:document.getElementById('fA').value,
+      maritalStatus:document.getElementById('fMarital').value,
+      spouseName:document.getElementById('fSp').value,
+      ghanaCardNumber:document.getElementById('fGh').value,
+      previousChurch:document.getElementById('fPrev').value
+    };
     if(newPhotoUrl)upd.photoUrl=newPhotoUrl;
     const r=await apiPost('updateMember',{data:upd});if(!r.success)throw new Error(r.error);
     currentUser=upd;const i=CACHE.members.findIndex(m=>m.id===currentUser.id);if(i>=0)CACHE.members[i]=upd;
