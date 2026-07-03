@@ -1,583 +1,540 @@
-/**
- * ================================================
- *  BETHEL SOCIETY – JAMDEDE
- *  Google Apps Script Backend API
- *  Methodist Church Ghana | Berekum Circuit
- * ================================================
- *
- *  FIRST-TIME SETUP (do this once):
- *  1. Open this script in Google Apps Script
- *  2. Click Run → setupSheets()  (initialises all sheets + admin user)
- *  3. Click Deploy → New Deployment → Web App
- *     - Execute as: Me
- *     - Who has access: Anyone
- *  4. Copy the Web App URL into bethel_portal_v2.html
- *
- *  DEFAULT ADMIN LOGIN: admin / bethel2025
- *  (Change the password via the portal after first login)
- *
- *  SMS: Configure your Arkesel API Key + Sender ID from the
- *  portal's Settings & SMS page — no code changes needed.
- * ================================================
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bethel Society – Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--blue:#1A3A6B;--blue2:#0D2347;--gold:#C8960C;--gold2:#F0B429;--red:#B91C1C;--green:#15803D;--white:#fff;--offwhite:#F7F5F0;--grey:#6B7280;--light:#EAF0F9;--border:#E5E7EB;--sidebar:240px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#F3F4F6;color:#111827;min-height:100vh;}
+/* FULL-SCREEN CARDS */
+.fs-screen{min-height:100vh;background:linear-gradient(160deg,var(--blue2),var(--blue));display:flex;align-items:center;justify-content:center;padding:1rem;}
+.fs-card{background:var(--white);border-radius:10px;padding:2.5rem;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.fs-card.wide{max-width:720px;}
+.fs-logo{text-align:center;margin-bottom:1.75rem;}
+.fs-logo .cross{font-size:2.5rem;color:var(--gold);}
+.fs-logo h1{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--blue2);margin-top:0.5rem;}
+.fs-logo p{font-size:0.73rem;color:var(--grey);margin-top:0.2rem;}
+/* TABS */
+.login-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.5rem;}
+.login-tab{flex:1;padding:0.6rem;text-align:center;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--grey);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+.login-tab.active{color:var(--blue);border-color:var(--blue);}
+/* FORMS */
+.form-group{margin-bottom:1rem;}
+.form-group label{display:block;font-size:0.76rem;font-weight:600;color:#374151;margin-bottom:0.35rem;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.68rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.86rem;font-family:'Inter',sans-serif;transition:border-color 0.2s;background:var(--white);}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);}
+.form-group textarea{resize:vertical;min-height:75px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.form-hint{font-size:0.72rem;color:var(--grey);margin-top:0.3rem;}
+.conditional-box{background:#F9FAFB;border:1px dashed var(--border);padding:1rem;border-radius:6px;margin-bottom:1rem;display:none;}
+.contact-entry{display:flex;gap:0.5rem;margin-bottom:0.5rem;}
+/* ORGANIZATIONS GRID */
+.org-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;background:#F9FAFB;padding:1rem;border-radius:6px;border:1px solid var(--border);}
+.org-item{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:#374151;}
+.org-item input[type="checkbox"]{width:auto;cursor:pointer;}
+/* BUTTONS */
+.btn{padding:0.7rem 1.4rem;border-radius:6px;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
+.btn-primary{background:var(--blue);color:var(--white);}
+.btn-primary:hover{background:var(--blue2);}
+.btn-gold{background:var(--gold);color:var(--blue2);}
+.btn-gold:hover{background:var(--gold2);}
+.btn-red{background:var(--red);color:var(--white);}
+.btn-red:hover{background:#991b1b;}
+.btn-green{background:var(--green);color:var(--white);}
+.btn-green:hover{background:#166534;}
+.btn-outline{background:transparent;color:var(--blue);border:1.5px solid var(--blue);}
+.btn-outline:hover{background:var(--light);}
+.btn-grey{background:#F3F4F6;color:#374151;border:1.5px solid var(--border);}
+.btn-grey:hover{background:#E5E7EB;}
+.btn-sm{padding:0.36rem 0.7rem;font-size:0.74rem;}
+.btn-full{width:100%;}
+.hint-box{background:var(--light);border-radius:6px;padding:0.7rem 1rem;font-size:0.74rem;color:var(--grey);margin-bottom:1.25rem;}
+.hint-box strong{color:var(--blue);}
+.err-box{background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;padding:0.65rem 0.9rem;border-radius:6px;font-size:0.8rem;margin-bottom:1rem;display:none;}
+.suc-box{background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;padding:0.65rem 0.9rem;border-radius:6px;font-size:0.8rem;margin-bottom:1rem;display:none;}
+.divider{display:flex;align-items:center;gap:0.75rem;margin:1.25rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider span{font-size:0.72rem;color:var(--grey);}
+/* LOADER */
+#globalLoader{position:fixed;inset:0;background:rgba(13,35,71,0.93);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;color:var(--white);}
+#globalLoader.show{display:flex;}
+.pulse-cross{font-size:3rem;color:var(--gold);animation:pulse 1.3s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.55;transform:scale(0.88);}}
+.loader-txt{margin-top:1rem;font-size:0.88rem;color:rgba(255,255,255,0.65);}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:0.75rem 1.25rem;border-radius:8px;font-size:0.82rem;font-weight:500;z-index:9998;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:320px;background:var(--blue2);color:var(--white);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+/* PORTAL LAYOUT */
+#portal{display:none;min-height:100vh;}
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--blue2);overflow-y:auto;z-index:100;transition:transform 0.3s;display:flex;flex-direction:column;}
+.sb-hdr{padding:1.4rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sb-cross{font-size:1.5rem;color:var(--gold);}
+.sb-title{font-family:'Playfair Display',serif;color:var(--white);font-size:0.87rem;font-weight:700;margin-top:0.3rem;}
+.sb-sub{color:rgba(255,255,255,0.4);font-size:0.64rem;}
+.sb-nav{flex:1;padding:0.75rem 0;}
+.nav-sec{font-size:0.59rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:0.7rem 1.2rem 0.3rem;}
+.nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 1.2rem;color:rgba(255,255,255,0.68);cursor:pointer;font-size:0.81rem;font-weight:500;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:var(--white);}
+.nav-item.active{background:rgba(200,150,12,0.15);color:var(--gold2);border-left-color:var(--gold);}
+.nav-item .ico{font-size:0.95rem;width:18px;text-align:center;}
+.sb-user{padding:1rem 1.2rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:0.7rem;}
+.u-avatar{width:33px;height:33px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.83rem;font-weight:700;color:var(--blue2);flex-shrink:0;}
+.u-info{flex:1;min-width:0;}
+.u-name{font-size:0.77rem;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-role{font-size:0.63rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;}
+.btn-logout{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;font-size:1rem;padding:0.25rem;transition:color 0.2s;}
+.btn-logout:hover{color:var(--red);}
+#main{margin-left:var(--sidebar);min-height:100vh;display:flex;flex-direction:column;}
+#topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-left{display:flex;align-items:center;gap:0.85rem;}
+#menuToggle{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:4px;padding:4px;}
+#menuToggle span{display:block;width:21px;height:2px;background:var(--blue2);border-radius:2px;}
+.pg-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--blue2);}
+.tb-right{display:flex;align-items:center;gap:0.65rem;}
+.badge{display:inline-block;padding:0.18rem 0.6rem;border-radius:20px;font-size:0.65rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.badge-admin{background:var(--blue);color:var(--white);}
+.badge-member{background:var(--green);color:var(--white);}
+.badge-adherent{background:#F3F4F6;color:#6B7280;}
+.badge-catechumen{background:var(--light);color:var(--blue);}
+.badge-junior{background:#FEF3C7;color:#92400E;}
+.badge-full{background:#D1FAE5;color:var(--green);}
+.sync-pill"><div class="sync-dot"></div>Live · Drive</div>
+<span id="roleBadge" class="badge badge-admin">Admin</span>
+<span id="tbUser" style="font-size:0.8rem;color:var(--grey);font-weight:500;"></span>
+</div>
+</div>
+<div id="content"></div>
+</div>
+</div>
 
-// ========== CONFIGURATION ==========
-const API_KEY = 'BethelJamdede2025!'; // Change this to something unique and secret
-const ARKESEL_SEND_URL = 'https://sms.arkesel.com/api/v2/sms/send';
+<!-- MODAL -->
+<div id="overlay">
+<div class="modal" id="modal">
+<div class="modal-hdr"><div class="modal-title" id="modalTitle"></div><button class="modal-close" onclick="closeModal()">×</button></div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-footer" id="modalFooter"></div>
+</div>
+</div>
 
-// Connexion-wide numbering — Diocese / Circuit / Society codes for Bethel Society Jamdede
-const DIOCESE_CODE = 'M07';   // Sunyani Diocese
-const CIRCUIT_CODE = 'C04';   // Berekum Circuit
-const SOCIETY_CODE = 'S02';   // Bethel Society
+<!-- REGISTER SCREEN -->
+<div class="fs-screen" id="registerScreen" style="display:none">
+  <div class="fs-card wide">
+    <div class="fs-logo"><div class="cross">✝</div><h1>Register as Member</h1><p>Bethel Society Jamdede — Methodist Church Ghana</p></div>
+    <div class="err-box" id="regErr"></div>
+    <div id="regSuccess" style="display:none;background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;padding:1.2rem;border-radius:8px;margin-bottom:1rem;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:0.5rem">✅</div>
+      <strong style="font-size:0.95rem">Registration Successful!</strong>
+      <p style="font-size:0.82rem;margin-top:0.4rem">Your login details have been sent via SMS.</p>
+      <div id="regCredentials" style="background:rgba(0,0,0,0.06);border-radius:6px;padding:0.75rem;margin-top:0.75rem;font-family:monospace;font-size:0.85rem;text-align:left;"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:1rem" onclick="backToLogin()">Proceed to Login →</button>
+    </div>
+    <div id="regForm">
+      <!-- 1. Names -->
+      <div class="form-row">
+        <div class="form-group"><label>First Name / Other Names *</label><input id="rFirstNames" placeholder="e.g. Kwame Asante"></div>
+        <div class="form-group"><label>Last Name (Surname) *</label><input id="rLastName" placeholder="e.g. Osei"></div>
+      </div>
+      <!-- 2 & 3. DOB & Gender -->
+      <div class="form-row">
+        <div class="form-group"><label>Date of Birth *</label><input type="date" id="rDob" onchange="handleDobChange('rDob', 'rStatus')"></div>
+        <div class="form-group"><label>Gender *</label><select id="rGender"><option>Male</option><option>Female</option></select></div>
+      </div>
+      <!-- 4. Marital Status -->
+      <div class="form-row">
+        <div class="form-group"><label>Marital Status</label><select id="rMarital"><option>Single</option><option>Ordinance</option><option>Customary</option><option>Blessing</option><option>Divorced</option></select></div>
+        <div class="form-group"><label>Home Region</label><select id="rRegion"><option>Ahafo</option><option>Ashanti</option><option>Bono</option><option selected>Bono East</option><option>Central</option><option>Eastern</option><option>Greater Accra</option><option>Nothern</option><option>Savannah</option><option>North East</option><option>Upper East</option><option>Upper West</option><option>Volta</option><option>Oti</option><option>Western</option><option>Western North</option></select></div>
+      </div>
+      <!-- Hometown & Profession -->
+      <div class="form-row">
+        <div class="form-group"><label>Hometown</label><input id="rHometown" placeholder="e.g. Berekum"></div>
+        <div class="form-group"><label>Profession / Trade</label><input id="rProfession" placeholder="e.g. Carpenter, Accountant"></div>
+      </div>
+      <!-- 5. Employment Status -->
+      <div class="form-row">
+        <div class="form-group"><label>Employment Status</label><select id="rEmployment" onchange="toggleStudentCategory('rEmployment', 'rStudentCatWrapper')"><option>Formal</option><option>Self Employed</option><option>Unemployed</option><option>Student</option></select></div>
+        <div class="form-group" id="rStudentCatWrapper" style="display:none;"><label>Student Category</label><select id="rStudentCategory"><option>Elementary</option><option>Basic</option><option>JHS</option><option>SHS</option><option>NVTI / Vocational Training</option><option>Tertiary (University/Training College)</option></select></div>
+      </div>
+      <!-- 9. Multiple Contacts Dynamic Room -->
+      <div class="form-group">
+        <label>Contact Number(s) *</label>
+        <div id="rContactsContainer">
+          <div class="contact-entry"><input class="r-phone-input" placeholder="Primary Phone (02X XXXXXXX)" type="tel"></div>
+        </div>
+        <button type="button" class="btn btn-grey btn-sm" style="margin-top:0.25rem" onclick="addContactField('rContactsContainer')">+ Add Another Contact Number</button>
+      </div>
+      <!-- 10. Membership Type -->
+      <div class="form-row">
+        <div class="form-group"><label>Membership Type *</label><select id="rStatus"><option>Full Member</option><option>Adherent</option><option>Catechumen</option><option>Junior Member</option></select><div class="form-hint" id="rAgeHint">Auto-set to Junior if under 18.</div></div>
+        <div class="form-group"><label>Distant Member?</label><select id="rIsDistant" onchange="toggleDistantFields('rIsDistant','rDistantWrapper')"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+      </div>
+      <!-- 11. Conditional Distant Details -->
+      <div id="rDistantWrapper" class="conditional-box">
+        <div class="form-row three">
+          <div class="form-group"><label>Diocese Name</label><input id="rDistantDiocese" placeholder="e.g. Sunyani Diocese"></div>
+          <div class="form-group"><label>Circuit Name</label><input id="rDistantCircuit" placeholder="e.g. Berekum Circuit"></div>
+          <div class="form-group"><label>Society Name</label><input id="rDistantSociety" placeholder="e.g. Bethel Society"></div>
+        </div>
+      </div>
+      <!-- 12 & 13. Invalid status & Optional Role -->
+      <div class="form-row">
+        <div class="form-group"><label>Invalid Member (SICK/BOUND)?</label><select id="rIsInvalid"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+        <div class="form-group"><label>Children Service Teacher?</label><select id="rChildrenTeacher"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+      </div>
+      <!-- 14. Organizations Checks -->
+      <div class="form-group">
+        <label>Church Organizations / Fellowships Joined</label>
+        <div class="org-grid" id="rOrgs">
+          <label class="org-item"><input type="checkbox" value="Men's Fellowship"> Men's Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Women's Fellowship"> Women's Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Christ Little Band"> Christ Little Band</label>
+          <label class="org-item"><input type="checkbox" value="Guild"> Guild</label>
+          <label class="org-item"><input type="checkbox" value="SUWMA"> SUWMA</label>
+          <label class="org-item"><input type="checkbox" value="Choir"> Choir</label>
+          <label class="org-item"><input type="checkbox" value="Singing Band"> Singing Band</label>
+          <label class="org-item"><input type="checkbox" value="MYF"> MYF (Youth)</label>
+          <label class="org-item"><input type="checkbox" value="Brigade"> Boys' & Girls' Brigade</label>
+          <label class="org-item"><input type="checkbox" value="Girls Fellowship"> Girls Fellowship</label>
+          <label class="org-item"><input type="checkbox" value="Gospel Band"> Gospel Band</label>
+        </div>
+      </div>
+      <p class="form-hint" style="margin-bottom:1rem">Your access credentials will be automatically generated and sent to your primary phone number.</p>
+      <button class="btn btn-gold btn-full" onclick="doRegister()">Register System Record →</button>
+      <div class="divider"><span>or</span></div>
+      <button class="btn btn-grey btn-full" onclick="backToLogin()">← Back to Login</button>
+    </div>
+  </div>
+</div>
 
-// ========== REQUEST HANDLERS ==========
-function doGet(e) {
-  try {
-    if (!e.parameter.key || e.parameter.key !== API_KEY)
-      return respond({ success: false, error: 'Unauthorized' });
+<!-- LOGIN SCREEN -->
+<div class="fs-screen" id="loginScreen" style="display:none">
+  <div class="fs-card">
+    <div class="fs-logo"><div class="cross">✝</div><h1>Bethel Society Portal</h1><p>Jamdede &bull; Berekum Circuit &bull; Methodist Church Ghana</p></div>
+    <div class="login-tabs">
+      <div class="login-tab active" onclick="setTab('admin')">Admin</div>
+      <div class="login-tab" onclick="setTab('member')">Member</div>
+    </div>
+    <div id="adminHint" class="hint-box"><strong>Admin:</strong> admin &nbsp;/&nbsp; bethel2025</div>
+    <div id="memberHint" class="hint-box" style="display:none">Use your registered username and password. If you don't have one, register below.</div>
+    <div class="err-box" id="loginErr"></div>
+    <div class="form-group"><label>Username</label><input id="loginUser" placeholder="Username" autocomplete="username"></div>
+    <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+    <div class="divider"><span>New member?</span></div>
+    <button class="btn btn-gold btn-full" onclick="showRegister()">Register as Member</button>
+  </div>
+</div>
 
-    switch (e.parameter.action) {
-      case 'ping':          return respond({ success: true, message: 'Bethel API is running ✝' });
-      case 'getMembers':    return respond({ success: true, data: getRows('Members') });
-      case 'getAttendance': return respond({ success: true, data: getRows('Attendance') });
-      case 'getMeetings':   return respond({ success: true, data: getRows('Meetings') });
-      case 'getFinances':   return respond({ success: true, data: getRows('Finances') });
-      case 'getSMSConfig':  return respond(getSMSConfig());
-      case 'checkBirthdays':return respond(checkBirthdays());
-      case 'migrateMembers':return respond(migrateMembersSheet());
-      case 'setup':         return respond(setupSheets());
-      default:              return respond({ success: false, error: 'Unknown action' });
-    }
-  } catch (err) {
-    return respond({ success: false, error: err.toString() });
-  }
-}
+<!-- PORTAL -->
+<div id="portal">
+  <div id="sidebar">
+    <div class="sb-hdr"><div class="sb-cross">✝</div><div class="sb-title">Bethel Society</div><div class="sb-sub">Member Portal</div></div>
+    <nav class="sb-nav" id="sbNav"></nav>
+    <div class="sb-user">
+      <div class="u-avatar" id="sbAv">?</div>
+      <div class="u-info"><div class="u-name" id="sbName">User</div><div class="u-role" id="sbRole">Member</div></div>
+      <button class="btn-logout" onclick="doLogout()" title="Logout">✕</button>
+    </div>
+  </div>
+  <div id="main">
+    <div id="topbar">
+      <div class="tb-left">
+        <button id="menuToggle" onclick="toggleSB()"><span></span><span></span><span></span></button>
+        <div class="pg-title" id="pgTitle">Dashboard</div>
+      </div>
+      <div class="tb-right">
+        <div class="sync-pill"><div class="sync-dot"></div>Live · Drive</div>
+        <span id="roleBadge" class="badge badge-admin">Admin</span>
+        <span id="tbUser" style="font-size:0.8rem;color:var(--grey);font-weight:500;"></span>
+      </div>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
 
-function doPost(e) {
-  try {
-    const body = JSON.parse(e.postData.contents);
-    if (!body.key || body.key !== API_KEY)
-      return respond({ success: false, error: 'Unauthorized' });
+<script>
+// ===== CONFIG =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbzWKd_fyjAJQ1rI__sCUlJ-i-g_K_m2g4qOtm9scfhR2X21uf2HHAQcEOdykUIRWPVJ/exec';
+const API_KEY = 'BethelJamdede2025!';
+let CACHE = { members:[], attendance:[], meetings:[], finances:[] };
+let currentUser = null, loginTab = 'admin', charts = {};
 
-    switch (body.action) {
-      case 'addMember':        return respond(addMemberRow(body.data));
-      case 'updateMember':     return respond(updateRow('Members', body.data));
-      case 'deleteMember':     return respond(deleteRow('Members', body.id));
-      case 'registerMember':   return respond(registerMember(body.data));
-      case 'registerMultiple': return respond(registerMultiple(body.members));
-      case 'addAttendance':    return respond(addRow('Attendance', body.data));
-      case 'deleteAttendance': return respond(deleteRow('Attendance', body.id));
-      case 'addMeeting':       return respond(addRow('Meetings', body.data));
-      case 'deleteMeeting':    return respond(deleteRow('Meetings', body.id));
-      case 'addFinance':       return respond(addFinanceWithReceipt(body.data));
-      case 'deleteFinance':    return respond(deleteRow('Finances', body.id));
-      case 'saveSMSConfig':    return respond(saveSMSConfig(body.config));
-      case 'sendTestSMS':      return respond(sendTestSMS(body.phone));
-      case 'sendBirthdaySMS':  return respond(sendBirthdayToMember(body.memberId));
-      case 'setupTrigger':     return respond(setupTrigger());
-      case 'uploadPhoto':      return respond(uploadPhoto(body.data, body.filename, body.mimeType));
-      default:                 return respond({ success: false, error: 'Unknown action' });
-    }
-  } catch (err) {
-    return respond({ success: false, error: err.toString() });
-  }
-}
+// ===== INIT =====
+window.onload = () => { show('loginScreen'); };
 
-function respond(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-// ========== SHEET OPERATIONS ==========
-function getSheet(name) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
-  if (!sheet) throw new Error('Sheet "' + name + '" not found. Please run setupSheets() first.');
-  return sheet;
-}
-
-function getRows(sheetName) {
-  const sheet = getSheet(sheetName);
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return [];
-  const lastCol = sheet.getLastColumn();
-  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const rows = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
-  return rows
-    .filter(row => row[0] !== '')
-    .map(row => {
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = String(row[i] ?? ''); });
-      return obj;
-    });
-}
-
-function addRow(sheetName, data) {
-  const sheet = getSheet(sheetName);
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  if (!data.id) data.id = Utilities.getUuid();
-  if (!data.createdAt) data.createdAt = new Date().toISOString();
-  const row = headers.map(h => (data[h] !== undefined ? data[h] : ''));
-  sheet.appendRow(row);
-  return { success: true, id: data.id };
-}
-
-// ========== SOCIETY MEMBER ID (Connexion-wide format) ==========
-// Format: M07/C04/S02/00001 — Diocese / Circuit / Society / sequential member number
-function generateSocietyId() {
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000); // wait up to 10s for exclusive access
-  try {
-    const members = getRows('Members');
-    const prefix = DIOCESE_CODE + '/' + CIRCUIT_CODE + '/' + SOCIETY_CODE + '/';
-    let maxNum = 0;
-    members.forEach(m => {
-      if (m.societyId && m.societyId.indexOf(prefix) === 0) {
-        const num = parseInt(m.societyId.slice(prefix.length), 10);
-        if (!isNaN(num) && num > maxNum) maxNum = num;
-      }
-    });
-    const next = String(maxNum + 1).padStart(5, '0');
-    return prefix + next;
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-// Wrapper used by every path that creates a new member, so the society ID is always assigned
-function addMemberRow(data) {
-  if (!data.societyId) data.societyId = generateSocietyId();
-  return addRow('Members', data);
-}
-
-function updateRow(sheetName, data) {
-  const sheet = getSheet(sheetName);
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { success: false, error: 'No data found' };
-  const lastCol = sheet.getLastColumn();
-  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const allIds = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map(String);
-  const rowIdx = allIds.indexOf(String(data.id));
-  if (rowIdx === -1) return { success: false, error: 'Record not found' };
-  const existing = sheet.getRange(rowIdx + 2, 1, 1, lastCol).getValues()[0];
-  const newRow = headers.map((h, i) => (data[h] !== undefined ? data[h] : existing[i]));
-  sheet.getRange(rowIdx + 2, 1, 1, lastCol).setValues([newRow]);
-  return { success: true };
-}
-
-function deleteRow(sheetName, id) {
-  const sheet = getSheet(sheetName);
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return { success: false, error: 'No data found' };
-  const allIds = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map(String);
-  const rowIdx = allIds.indexOf(String(id));
-  if (rowIdx === -1) return { success: false, error: 'Record not found' };
-  sheet.deleteRow(rowIdx + 2);
-  return { success: true };
-}
-
-// ========== FIRST-TIME SETUP ==========
-function setupSheets() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  const schemas = {
-    Members:    ['id','societyId','firstName','lastName','fullName','gender','dob','phone','additionalContacts','email','address','homeRegion','hometown','occupation','employmentStatus','studentLevel','classGroup','organizations','membershipStatus','distantMember','distantDiocese','distantCircuit','distantSociety','invalidMember','roles','layMovementPosition','joinDate','username','password','role','createdAt','maritalStatus','spouseName','baptismDate','confirmationDate','previousChurch','ghanaCardNumber','photoUrl'],
-    Attendance: ['id','date','serviceType','totalPresent','notes','recordedBy','createdAt'],
-    Meetings:   ['id','date','meetingType','totalPresent','notes','recordedBy','createdAt'],
-    Finances:   ['id','date','category','amount','description','recordedBy','createdAt']
-  };
-
-  const colors = { Members:'#1A3A6B', Attendance:'#15803D', Meetings:'#B91C1C', Finances:'#C8960C' };
-
-  Object.entries(schemas).forEach(([name, headers]) => {
-    let sheet = ss.getSheetByName(name);
-    if (!sheet) sheet = ss.insertSheet(name);
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(headers);
-      const hr = sheet.getRange(1, 1, 1, headers.length);
-      hr.setBackground(colors[name] || '#1A3A6B');
-      hr.setFontColor('#FFFFFF');
-      hr.setFontWeight('bold');
-      sheet.setFrozenRows(1);
-      sheet.setColumnWidth(1, 220);
-    }
+function show(id) {
+  ['registerScreen','loginScreen','portal'].forEach(x => {
+    const el = document.getElementById(x);
+    if (!el) return;
+    el.style.display = x === id ? (x === 'portal' ? 'block' : 'flex') : 'none';
   });
-
-  // Seed admin user if Members sheet is fresh
-  const membersSheet = ss.getSheetByName('Members');
-  if (membersSheet.getLastRow() <= 1) {
-    membersSheet.appendRow([
-      Utilities.getUuid(),
-      'Society Administrator','Male','1975-01-01',
-      '0241000000','admin@bethelsociety.gh','Jamdede',
-      'Church Administrator','Admin','Full Member',
-      '2000-01-01','admin','bethel2025','admin',
-      new Date().toISOString()
-    ]);
-  }
-
-  return { success: true, message: 'Setup complete! All sheets created. Admin login: admin / bethel2025' };
 }
 
-// ========== MIGRATION: add new member fields to an existing sheet ==========
-function migrateMembersSheet() {
-  const sheet = getSheet('Members');
-  const lastCol = sheet.getLastColumn();
-  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const newFields = ['societyId','firstName','lastName','additionalContacts','homeRegion','hometown','employmentStatus','studentLevel','organizations','distantMember','distantDiocese','distantCircuit','distantSociety','invalidMember','roles','layMovementPosition','maritalStatus','spouseName','baptismDate','confirmationDate','previousChurch','ghanaCardNumber','photoUrl'];
-  const toAdd = newFields.filter(f => headers.indexOf(f) === -1);
-
-  if (toAdd.length) {
-    const range = sheet.getRange(1, lastCol + 1, 1, toAdd.length);
-    range.setValues([toAdd]);
-    range.setBackground('#1A3A6B');
-    range.setFontColor('#FFFFFF');
-    range.setFontWeight('bold');
+// ===== CONDITIONAL CONDITIONAL FIELD HANDLERS =====
+function toggleStudentCategory(selectId, wrapperId) {
+  const val = document.getElementById(selectId).value;
+  document.getElementById(wrapperId).style.display = (val === 'Student') ? 'block' : 'none';
+}
+function toggleDistantFields(selectId, wrapperId) {
+  const val = document.getElementById(selectId).value;
+  document.getElementById(wrapperId).style.display = (val === 'Yes') ? 'block' : 'none';
+}
+function addContactField(containerId, value = '') {
+  const container = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'contact-entry';
+  div.innerHTML = `<input class="r-phone-input" placeholder="Alternate Phone" type="tel" value="${value}"><button type="button" class="btn btn-red btn-sm" onclick="this.parentNode.remove()">✕</button>`;
+  container.appendChild(div);
+}
+function handleDobChange(dobId, statusSelectId) {
+  const dobVal = document.getElementById(dobId).value;
+  if(!dobVal) return;
+  const age = new Date().getFullYear() - new Date(dobVal).getFullYear();
+  if (age < 18) {
+    document.getElementById(statusSelectId).value = 'Junior Member';
   }
-
-  // Backfill societyId for any existing members that don't have one yet, in row order
-  const finalHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const idCol = finalHeaders.indexOf('societyId') + 1;
-  if (idCol > 0) {
-    const lastRow2 = sheet.getLastRow();
-    if (lastRow2 >= 2) {
-      const idValues = sheet.getRange(2, idCol, lastRow2 - 1, 1).getValues();
-      const prefix = DIOCESE_CODE + '/' + CIRCUIT_CODE + '/' + SOCIETY_CODE + '/';
-      let maxNum = 0;
-      idValues.forEach(row => {
-        const v = String(row[0] || '');
-        if (v.indexOf(prefix) === 0) {
-          const n = parseInt(v.slice(prefix.length), 10);
-          if (!isNaN(n) && n > maxNum) maxNum = n;
-        }
-      });
-      let assigned = 0;
-      for (let i = 0; i < idValues.length; i++) {
-        if (!idValues[i][0]) {
-          maxNum++;
-          sheet.getRange(2 + i, idCol).setValue(prefix + String(maxNum).padStart(5, '0'));
-          assigned++;
-        }
-      }
-      if (assigned) toAdd.push('(backfilled ' + assigned + ' existing member ID' + (assigned === 1 ? '' : 's') + ')');
-    }
-  }
-
-  return {
-    success: true,
-    added: toAdd,
-    message: toAdd.length ? ('Added new columns: ' + toAdd.join(', ')) : 'All fields already present — nothing to add.'
-  };
 }
 
-// ========== PHOTO UPLOAD (saved to Google Drive) ==========
-function uploadPhoto(base64Data, filename, mimeType) {
+// ===== API CORE =====
+async function apiGet(action) {
+  const res = await fetch(API_URL + '?' + new URLSearchParams({key:API_KEY,action}), {redirect:'follow'});
+  return res.json();
+}
+async function apiPost(action, payload) {
+  const res = await fetch(API_URL, {method:'POST', body:JSON.stringify({key:API_KEY,action,...payload}), redirect:'follow'});
+  return res.json();
+}
+
+// ===== AUTH =====
+function setTab(t) {
+  loginTab = t;
+  document.querySelectorAll('.login-tab').forEach((el,i) => el.classList.toggle('active', i===(t==='admin'?0:1)));
+  document.getElementById('adminHint').style.display = t==='admin'?'':'none';
+  document.getElementById('memberHint').style.display = t==='member'?'':'none';
+}
+async function doLogin() {
+  const u = document.getElementById('loginUser').value.trim(), p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr'); err.style.display = 'none';
+  if (!u||!p) { err.textContent='Enter username and password.'; err.style.display='block'; return; }
+  showLoader('Signing in...');
   try {
-    if (!base64Data) return { success: false, error: 'No image data received.' };
-
-    const folderName = 'Bethel Society Member Photos';
-    const folders = DriveApp.getFoldersByName(folderName);
-    const folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
-
-    // Strip data URL prefix if present (e.g. "data:image/jpeg;base64,....")
-    const cleanBase64 = base64Data.indexOf(',') !== -1 ? base64Data.split(',')[1] : base64Data;
-    const decoded = Utilities.base64Decode(cleanBase64);
-    const blob = Utilities.newBlob(decoded, mimeType || 'image/jpeg', filename || ('member_' + Date.now() + '.jpg'));
-
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    const url = 'https://drive.google.com/uc?export=view&id=' + file.getId();
-
-    return { success: true, url: url, fileId: file.getId() };
-  } catch (err) {
-    return { success: false, error: err.toString() };
-  }
+    const res = await apiGet('getMembers'); CACHE.members = res.data || [];
+    const found = CACHE.members.find(m=>m.username===u&&m.password===p);
+    if (!found) { hideLoader(); err.textContent='Invalid username or password.'; err.style.display='block'; return; }
+    if (loginTab==='admin'&&found.role!=='admin') { hideLoader(); err.textContent='Admin credentials required.'; err.style.display='block'; return; }
+    currentUser = found; await loadAll(); startPortal();
+  } catch(e) { hideLoader(); err.textContent='Connection error: '+e.message; err.style.display='block'; }
+}
+function doLogout() {
+  currentUser = null; CACHE = {members:[],attendance:[],meetings:[],finances:[]};
+  show('loginScreen'); document.getElementById('loginUser').value=''; document.getElementById('loginPass').value='';
 }
 
-// ========== MEMBER REGISTRATION (self-service + bulk) ==========
-function generateUsername(fullName) {
-  const base = (fullName || 'member')
-    .toLowerCase()
-    .replace(/[^a-z\s]/g, '')
-    .trim()
-    .split(/\s+/)[0] || 'member';
-  const existing = getRows('Members').map(m => (m.username || '').toLowerCase());
-  let candidate = base;
-  let n = Math.floor(100 + Math.random() * 900); // 3-digit suffix
-  candidate = base + n;
-  while (existing.indexOf(candidate.toLowerCase()) !== -1) {
-    n = Math.floor(100 + Math.random() * 900);
-    candidate = base + n;
-  }
-  return candidate;
+async function loadAll() {
+  showLoader('Loading church data...');
+  const [a,m,f] = await Promise.all([apiGet('getAttendance'),apiGet('getMeetings'),apiGet('getFinances')]);
+  CACHE.attendance=a.data||[]; CACHE.meetings=m.data||[]; CACHE.finances=f.data||[];
+  hideLoader();
 }
 
-function generatePassword() {
-  return String(Math.floor(100000 + Math.random() * 900000)); // 6-digit numeric temp password
+function startPortal() {
+  show('portal');
+  const isAdmin = currentUser.role==='admin';
+  document.getElementById('sbAv').textContent = currentUser.fullName ? currentUser.fullName[0] : '?';
+  document.getElementById('sbName').textContent = currentUser.fullName || 'Admin User';
+  document.getElementById('sbRole').textContent = isAdmin?'Administrator':currentUser.membershipStatus;
+  document.getElementById('tbUser').textContent = currentUser.fullName || 'Admin';
+  document.getElementById('roleBadge').className = 'badge '+(isAdmin?'badge-admin':'badge-member');
+  document.getElementById('roleBadge').textContent = isAdmin?'Admin':'Member';
+  buildNav(isAdmin); navigate(isAdmin?'dashboard':'myprofile');
 }
 
-function calcAge(dobStr) {
-  if (!dobStr) return null;
-  const dob = new Date(dobStr);
-  if (isNaN(dob.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-  return age;
+function buildNav(isAdmin) {
+  document.getElementById('sbNav').innerHTML = isAdmin ? `
+    <div class="nav-sec">Overview</div>
+    <div class="nav-item" onclick="navigate('dashboard')" data-view="dashboard"><span class="ico">📊</span> Dashboard</div>
+    <div class="nav-sec">Church Records</div>
+    <div class="nav-item" onclick="navigate('members')" data-view="members"><span class="ico">👥</span> Members</div>
+    <div class="nav-item" onclick="navigate('attendance')" data-view="attendance"><span class="ico">⛪</span> Service Attendance</div>
+    <div class="nav-item" onclick="navigate('meetings')" data-view="meetings"><span class="ico">🤝</span> Meeting Attendance</div>
+    <div class="nav-item" onclick="navigate('finances')" data-view="finances"><span class="ico">💰</span> Finances</div>
+    <div class="nav-sec">Analytics & Tools</div>
+    <div class="nav-item" onclick="navigate('reports')" data-view="reports"><span class="ico">📈</span> Reports</div>
+    <div class="nav-item" onclick="navigate('settings')" data-view="settings"><span class="ico">⚙️</span> Settings & SMS</div>` : `
+    <div class="nav-sec">My Account</div>
+    <div class="nav-item" onclick="navigate('myprofile')" data-view="myprofile"><span class="ico">👤</span> My Profile</div>
+    <div class="nav-item" onclick="navigate('mystatus')" data-view="mystatus"><span class="ico">🎓</span> Membership Stage</div>`;
 }
 
-function registerMember(data) {
-  if (!data) return { success: false, error: 'No data received.' };
-  const firstName = (data.firstName || '').trim();
-  const lastName = (data.lastName || '').trim();
-  const fullName = (firstName || lastName) ? (firstName + ' ' + lastName).trim() : (data.fullName || '').trim();
-  if (!fullName || !data.phone)
-    return { success: false, error: 'Name and phone are required.' };
+function navigate(view) {
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
+  const titles={dashboard:'Dashboard',members:'Members',attendance:'Service Attendance',meetings:'Meeting Attendance',finances:'Finances',reports:'Reports & Growth',settings:'Settings & SMS',myprofile:'My Profile',mystatus:'Membership Journey'};
+  document.getElementById('pgTitle').textContent = titles[view]||'';
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  const views={dashboard:renderDashboard,members:renderMembers,attendance:renderAttendance,meetings:renderMeetings,finances:renderFinances,reports:renderReports,settings:renderSettings,myprofile:renderMyProfile,mystatus:renderMyStatus};
+  document.getElementById('content').innerHTML='';
+  if(views[view]) views[view]();
+}
+function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); }
 
-  const username = generateUsername(fullName);
-  const tempPassword = generatePassword();
+// ===== STRUCTURAL CONCATENATION & SMS HELPERS =====
+function sBadge(s){const m={'Adherent':'badge-adherent','Catechumen':'badge-catechumen','Junior Member':'badge-junior','Full Member':'badge-full'};return `<span class="badge ${m[s]||'badge-adherent'}">${s||'Adherent'}</span>`;}
+function fmt(n){return 'GH\u20B5'+Number(n||0).toLocaleString('en-GH',{minimumFractionDigits:2});}
+function fmtD(d){if(!d)return '\u2014'; return d;}
+function mo6(){const o=[];const n=new Date();for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);o.push(d.toISOString().slice(0,7));}return o;}
+function moLbl(ym){const[y,m]=ym.split('-');return new Date(y,m-1).toLocaleDateString('en-GB',{month:'short'});}
+function showLoader(msg){document.getElementById('loaderTxt').textContent=msg||'Loading...';document.getElementById('globalLoader').classList.add('show');}
+function hideLoader()){document.getElementById('globalLoader').classList.remove('show');}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';setTimeout(()=>t.classList.remove('show'),3500);}
 
-  // Anyone under 18 is automatically a Junior Member, regardless of what was selected
-  const age = calcAge(data.dob);
-  const membershipStatus = (age !== null && age < 18) ? 'Junior Member' : (data.membershipStatus || 'Adherent');
+function showRegister() { show('registerScreen'); document.getElementById('regErr').style.display='none'; document.getElementById('regSuccess').style.display='none'; document.getElementById('regForm').style.display=''; }
+function backToLogin() { show('loginScreen'); }
 
-  const record = {
-    id: Utilities.getUuid(),
-    firstName: firstName,
-    lastName: lastName,
-    fullName: fullName,
-    gender: data.gender || '',
-    dob: data.dob || '',
-    phone: data.phone,
-    additionalContacts: data.additionalContacts || '',
-    email: data.email || '',
-    address: data.address || '',
-    homeRegion: data.homeRegion || '',
-    hometown: data.hometown || '',
-    occupation: data.occupation || '',
-    employmentStatus: data.employmentStatus || '',
-    studentLevel: data.studentLevel || '',
-    classGroup: data.classGroup || 'Class A',
-    organizations: data.organizations || '',
-    membershipStatus: membershipStatus,
-    distantMember: data.distantMember || 'No',
-    distantDiocese: data.distantDiocese || '',
-    distantCircuit: data.distantCircuit || '',
-    distantSociety: data.distantSociety || '',
-    invalidMember: data.invalidMember || 'No',
-    roles: data.roles || '',
-    layMovementPosition: data.layMovementPosition || '',
-    joinDate: new Date().toISOString().slice(0, 10),
-    username: username,
-    password: tempPassword,
-    role: 'member',
-    createdAt: new Date().toISOString(),
-    maritalStatus: data.maritalStatus || '',
-    spouseName: data.spouseName || '',
-    baptismDate: data.baptismDate || '',
-    confirmationDate: data.confirmationDate || '',
-    previousChurch: data.previousChurch || '',
-    ghanaCardNumber: data.ghanaCardNumber || '',
-    photoUrl: data.photoUrl || ''
+// ===== SUBMIT MEMBER DATA PROCESSING =====
+async function doRegister() {
+  const fNames = document.getElementById('rFirstNames').value.trim();
+  const lName = document.getElementById('rLastName').value.trim();
+  const err = document.getElementById('regErr'); err.style.display='none';
+  
+  if(!fNames || !lName){err.textContent='First and Last names are explicitly required.';err.style.display='block';return;}
+  
+  // 1. First Name + Last Name Combination
+  const fullName = fNames + ' ' + lName;
+  
+  // 9. Collect Multiple Contacts
+  const phoneInputs = document.querySelectorAll('.r-phone-input');
+  let contacts = [];
+  phoneInputs.forEach(i => { if(i.value.trim()) contacts.push(i.value.trim()); });
+  if(!contacts.length) { err.textContent='At least one contact number is required.'; err.style.display='block'; return; }
+  
+  // 14. Collect Organization Checkboxes
+  let orgsChecked = [];
+  document.querySelectorAll('#rOrgs input[type="checkbox"]:checked').forEach(c => orgsChecked.push(c.value));
+
+  // Run auto age check block safely
+  handleDobChange('rDob', 'rStatus');
+
+  const data = {
+    fullName,
+    firstName: fNames,
+    lastName: lName,
+    dob: document.getElementById('rDob').value,
+    gender: document.getElementById('rGender').value,
+    maritalStatus: document.getElementById('rMarital').value,
+    homeRegion: document.getElementById('rRegion').value,
+    hometown: document.getElementById('rHometown').value,
+    profession: document.getElementById('rProfession').value,
+    employmentStatus: document.getElementById('rEmployment').value,
+    studentCategory: document.getElementById('rStudentCategory').value,
+    contacts: contacts.join(', '),
+    phone: contacts[0], // Main user dynamic communication channel
+    membershipStatus: document.getElementById('rStatus').value,
+    isDistant: document.getElementById('rIsDistant').value,
+    distantDiocese: document.getElementById('rDistantDiocese').value,
+    distantCircuit: document.getElementById('rDistantCircuit').value,
+    distantSociety: document.getElementById('rDistantSociety').value,
+    isInvalid: document.getElementById('rIsInvalid').value,
+    childrenTeacher: document.getElementById('rChildrenTeacher').value,
+    organizations: orgsChecked.join(', '),
+    joinDate: new Date().toISOString().slice(0,10)
   };
 
-  const result = addMemberRow(record);
-  if (!result.success) return result;
-
-  let smsSent = false;
+  showLoader('Syncing profile registry...');
   try {
-    if (isSmsEnabled()) {
-      const msg = 'Welcome to Bethel Society Jamdede, ' + fullName + '! Your portal login — Username: ' +
-        username + ' | Password: ' + tempPassword + '. Please change your password after logging in. God bless you!';
-      const smsRes = sendArkeselSms(data.phone, msg);
-      smsSent = !!(smsRes && smsRes.ok);
-    }
-  } catch (e) { smsSent = false; }
-
-  return { success: true, id: record.id, societyId: record.societyId, username: username, tempPassword: tempPassword, smsSent: smsSent };
+    const res = await apiPost('registerMember', {data});
+    hideLoader();
+    if(!res.success){err.textContent=res.error||'Registration structural submission failure.';err.style.display='block';return;}
+    document.getElementById('regForm').style.display='none';
+    document.getElementById('regCredentials').innerHTML='<strong>Username:</strong> '+res.username+'<br><strong>System Password:</strong> '+res.tempPassword;
+    document.getElementById('regSuccess').style.display='block';
+    CACHE.members.push({...data, id:res.id, username:res.username, password:res.tempPassword, role:'member'});
+  } catch(e){hideLoader();err.textContent='Network Exception: '+e.message;err.style.display='block';}
 }
 
-function registerMultiple(members) {
-  if (!members || !members.length) return { success: false, error: 'No members provided.' };
-  const results = [];
-  let registered = 0;
-
-  members.forEach(m => {
-    try {
-      const r = registerMember(m);
-      if (r.success) {
-        registered++;
-        results.push({
-          success: true,
-          id: r.id,
-          societyId: r.societyId,
-          fullName: m.fullName,
-          phone: m.phone,
-          gender: m.gender || '',
-          classGroup: m.classGroup || 'Class A',
-          membershipStatus: m.membershipStatus || 'Adherent',
-          joinDate: new Date().toISOString().slice(0, 10),
-          username: r.username,
-          password: r.tempPassword,
-          role: 'member'
-        });
-      } else {
-        results.push({ success: false, fullName: m.fullName, error: r.error });
-      }
-    } catch (e) {
-      results.push({ success: false, fullName: m.fullName, error: e.toString() });
-    }
-  });
-
-  return { success: true, total: members.length, registered: registered, results: results };
+// ===== DASHBOARD GENERATION =====
+function renderDashboard() {
+  const mems=CACHE.members.filter(m=>m.role!=='admin');
+  const totalInc=CACHE.finances.reduce((a,f)=>a+Number(f.amount||0),0);
+  document.getElementById('content').innerHTML=`
+    <div class="stats-row">
+      <div class="stat-box blue"><div class="s-ico">👥</div><div class="s-val">${mems.length}</div><div class="s-lbl">Total Base Registry</div></div>
+      <div class="stat-box green"><div class="s-ico">💰</div><div class="s-val">${fmt(totalInc)}</div><div class="s-lbl">Gross Inflows</div></div>
+    </div>
+    <div class="card"><div class="card-hdr"><div class="card-title">Recent Congregation Registry</div></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Status</th><th>Contacts</th></tr></thead><tbody>${mems.slice(-5).reverse().map(m=>`<tr><td>${m.fullName}</td><td>${sBadge(m.membershipStatus)}</td><td>${m.contacts||m.phone||'—'}</td></tr>`).join('')}</tbody></table></div></div>`;
 }
 
-// ========== FINANCE WITH SMS RECEIPT ==========
-function addFinanceWithReceipt(data) {
-  const result = addRow('Finances', data);
-  if (!result.success) return result;
-
-  try {
-    if (data.sendSMS === 'true' && data.phone && isSmsEnabled()) {
-      const amt = 'GH₵' + Number(data.amount || 0).toLocaleString();
-      const msg = 'Dear ' + (data.memberName || 'Member') + ', thank you for your ' + (data.category || 'contribution') +
-        ' of ' + amt + ' to Bethel Society Jamdede. God bless your generosity! — 2 Corinthians 9:7';
-      sendArkeselSms(data.phone, msg);
-    }
-  } catch (e) { /* don't fail the finance record if SMS fails */ }
-
-  return result;
+// ===== ADMINISTRATIVE PANEL VIEW =====
+function renderMembers() {
+  const all=CACHE.members.filter(m=>m.role!=='admin');
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Congregation Member Master File (${all.length})</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Full Combined Name</th><th>Gender</th><th>Contacts Matrix</th><th>Stage Status</th><th>Hometown</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            ${all.map(m=>`<tr>
+              <td><strong>${m.fullName}</strong></td>
+              <td>${m.gender||'—'}</td>
+              <td>${m.contacts||m.phone||'—'}</td>
+              <td>${sBadge(m.membershipStatus)}</td>
+              <td>${m.hometown||'—'}</td>
+              <td><button class="btn btn-red btn-sm" onclick="deleteMember('${m.id}')">Remove Record</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
-// ========== SMS CONFIG (stored in Script Properties, not the sheet) ==========
-function getSMSConfig() {
-  const props = PropertiesService.getScriptProperties();
-  return {
-    success: true,
-    data: {
-      apiKey: props.getProperty('SMS_API_KEY') || '',
-      senderId: props.getProperty('SMS_SENDER_ID') || 'BethelSoc',
-      enabled: props.getProperty('SMS_ENABLED') === 'true'
-    }
-  };
+async function deleteMember(id){
+  if(!confirm('Purge this record completely from sheet framework?'))return;
+  showLoader('Purging database log...');
+  try{const r=await apiPost('deleteMember',{id});if(!r.success)throw new Error(r.error);CACHE.members=CACHE.members.filter(m=>m.id!==id);hideLoader();renderMembers();toast('Record permanently dropped.','success');}
+  catch(e){hideLoader();toast('Error: '+e.message,'error');}
 }
 
-function saveSMSConfig(config) {
-  if (!config) return { success: false, error: 'No config provided.' };
-  const props = PropertiesService.getScriptProperties();
-  props.setProperty('SMS_API_KEY', config.apiKey || '');
-  props.setProperty('SMS_SENDER_ID', config.senderId || 'BethelSoc');
-  props.setProperty('SMS_ENABLED', config.enabled ? 'true' : 'false');
-  return { success: true };
+// Simple fallback view render shells
+function renderAttendance() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Attendance interface framework ready.</div>'; }
+function renderMeetings() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Meeting management framework ready.</div>'; }
+function renderFinances() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Financial auditing dashboard ready.</div>'; }
+function renderReports() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">Growth metrics data modules compiled.</div>'; }
+function renderSettings() { document.getElementById('content').innerHTML='<div class="card" style="padding:2rem;">System config setup matrix initialized.</div>'; }
+
+// ===== CONGREGATION SELF SERVICE VIEWS =====
+function renderMyProfile(){
+  const m=currentUser;
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Verified Profile Ledger Details</div></div>
+      <div class="card-body">
+        <p><strong>Combined Name Structure:</strong> ${m.fullName}</p>
+        <p><strong>Registry Contact Array:</strong> ${m.contacts||m.phone||'—'}</p>
+        <p><strong>Methodist Stage Status:</strong> ${m.membershipStatus}</p>
+        <p><strong>Employment Segment:</strong> ${m.employmentStatus} ${m.studentCategory?`(${m.studentCategory})`:''}</p>
+        <p><strong>Hometown Baseline:</strong> ${m.hometown} (${m.homeRegion} Region)</p>
+        <p><strong>Invalid (Sick/Bound) Status:</strong> ${m.isInvalid||'No'}</p>
+        <p><strong>Organizations Portfolio:</strong> ${m.organizations||'None Selected'}</p>
+      </div>
+    </div>`;
 }
 
-function isSmsEnabled() {
-  const props = PropertiesService.getScriptProperties();
-  return props.getProperty('SMS_ENABLED') === 'true' && !!props.getProperty('SMS_API_KEY');
+function renderMyStatus(){
+  const m=currentUser;
+  document.getElementById('content').innerHTML=`
+    <div class="card" style="padding:2rem;">
+      <h3>Your Connessional Stage Standing</h3>
+      <p style="margin-top:1rem;">Current Status: ${sBadge(m.membershipStatus)}</p>
+    </div>`;
 }
-
-// ========== ARKESEL SMS SENDING ==========
-function formatGhPhone(phone) {
-  let p = String(phone || '').replace(/[^\d]/g, '');
-  if (p.startsWith('0')) p = '233' + p.slice(1);
-  else if (!p.startsWith('233')) p = '233' + p;
-  return p;
-}
-
-function sendArkeselSms(phone, message) {
-  const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty('SMS_API_KEY');
-  const senderId = props.getProperty('SMS_SENDER_ID') || 'BethelSoc';
-  if (!apiKey) return { ok: false, message: 'No Arkesel API key configured.' };
-
-  const payload = {
-    sender: senderId,
-    message: message,
-    recipients: [formatGhPhone(phone)]
-  };
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    headers: { 'api-key': apiKey },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  const res = UrlFetchApp.fetch(ARKESEL_SEND_URL, options);
-  const code = res.getResponseCode();
-  let json = {};
-  try { json = JSON.parse(res.getContentText()); } catch (e) { json = { raw: res.getContentText() }; }
-
-  return { ok: code >= 200 && code < 300 && json.status !== 'error', code: code, data: json };
-}
-
-function sendTestSMS(phone) {
-  if (!phone) return { success: false, error: 'Phone number is required.' };
-  const props = PropertiesService.getScriptProperties();
-  if (!props.getProperty('SMS_API_KEY')) return { success: false, error: 'Save your Arkesel API key first.' };
-
-  const res = sendArkeselSms(phone, 'This is a test message from Bethel Society Jamdede portal. SMS is working correctly! ✝');
-  if (res.ok) return { success: true, data: res.data };
-  return { success: false, error: (res.data && (res.data.message || JSON.stringify(res.data))) || 'SMS failed.' };
-}
-
-// ========== BIRTHDAY AUTOMATION ==========
-function birthdayMessage(fullName) {
-  return 'Happy Birthday, ' + fullName + '! 🎂 The entire Bethel Society Jamdede family wishes you a wonderful birthday full of God\'s blessings. "The LORD bless you and keep you; the LORD make his face shine on you..." — Numbers 6:24-25';
-}
-
-function sendBirthdayToMember(memberId) {
-  if (!memberId) return { success: false, error: 'Member ID required.' };
-  const members = getRows('Members');
-  const m = members.find(x => x.id === memberId);
-  if (!m) return { success: false, error: 'Member not found.' };
-  if (!m.phone) return { success: false, error: 'Member has no phone number on file.' };
-  if (!isSmsEnabled()) return { success: false, error: 'SMS is not enabled. Turn it on in Settings first.' };
-
-  const res = sendArkeselSms(m.phone, birthdayMessage(m.fullName));
-  if (res.ok) return { success: true };
-  return { success: false, error: (res.data && (res.data.message || JSON.stringify(res.data))) || 'SMS failed.' };
-}
-
-function checkBirthdays() {
-  const today = new Date();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-
-  const members = getRows('Members').filter(m => m.role !== 'admin' && m.dob);
-  let birthdays = 0, smsSent = 0;
-
-  members.forEach(m => {
-    const dobParts = String(m.dob).split('-'); // expects YYYY-MM-DD
-    if (dobParts.length < 3) return;
-    if (dobParts[1] === mm && dobParts[2].slice(0, 2) === dd) {
-      birthdays++;
-      if (m.phone && isSmsEnabled()) {
-        try {
-          const res = sendArkeselSms(m.phone, birthdayMessage(m.fullName));
-          if (res.ok) smsSent++;
-        } catch (e) { /* skip failed individual sends */ }
-      }
-    }
-  });
-
-  return { success: true, checked: members.length, birthdays: birthdays, smsSent: smsSent };
-}
-
-function setupTrigger() {
-  // Remove any existing triggers for checkBirthdays to avoid duplicates
-  const triggers = ScriptApp.getProjectTriggers();
-  triggers.forEach(t => {
-    if (t.getHandlerFunction() === 'checkBirthdays') ScriptApp.deleteTrigger(t);
-  });
-
-  ScriptApp.newTrigger('checkBirthdays')
-    .timeBased()
-    .everyDays(1)
-    .atHour(7)
-    .create();
-
-  return { success: true, message: 'Daily birthday SMS check activated — runs every day around 7:00 AM.' };
-}
+</script>
+</body>
+</html>
