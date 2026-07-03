@@ -218,6 +218,19 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#FAFAFA;}
       </div>
       <div class="form-group"><label>Residential Address</label><input id="rAddr" placeholder="Your home address"></div>
       <div class="form-row">
+        <div class="form-group"><label>Marital Status</label><select id="rMarital"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
+        <div class="form-group"><label>Spouse's Name</label><input id="rSpouse" placeholder="If married (optional)"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Ghana Card Number</label><input id="rGhanaCard" placeholder="GHA-XXXXXXXXX-X"></div>
+        <div class="form-group"><label>Previous Church (if any)</label><input id="rPrevChurch" placeholder="Optional"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Baptism Date</label><input type="date" id="rBaptism"></div>
+        <div class="form-group"><label>Confirmation Date</label><input type="date" id="rConfirm"></div>
+      </div>
+      <div class="form-group"><label>Photo</label><input type="file" id="rPhoto" accept="image/*"><div class="form-hint">Optional — a clear headshot for your member profile.</div></div>
+      <div class="form-row">
         <div class="form-group"><label>Class / Fellowship Group</label>
           <select id="rGroup">
             <option>Class A</option><option>Class B</option><option>Youth</option>
@@ -411,6 +424,15 @@ function toast(msg,type=''){const t=document.getElementById('toast');t.textConte
 // ===== SELF REGISTRATION =====
 function showRegister() { show('registerScreen'); document.getElementById('regErr').style.display='none'; document.getElementById('regSuccess').style.display='none'; document.getElementById('regForm').style.display=''; }
 function backToLogin() { show('loginScreen'); }
+function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});}
+async function uploadPhotoIfAny(fileInputId){
+  const inp=document.getElementById(fileInputId);
+  if(!inp||!inp.files||!inp.files[0]) return '';
+  const file=inp.files[0];
+  const base64=await fileToBase64(file);
+  const res=await apiPost('uploadPhoto',{data:base64,filename:file.name,mimeType:file.type});
+  return res.success ? res.url : '';
+}
 async function doRegister() {
   const name=document.getElementById('rName').value.trim(), phone=document.getElementById('rPhone').value.trim();
   const err=document.getElementById('regErr'); err.style.display='none';
@@ -418,7 +440,8 @@ async function doRegister() {
   if(!phone){err.textContent='Phone number is required (for SMS delivery of your login details).';err.style.display='block';return;}
   showLoader('Creating your account...');
   try {
-    const data={fullName:name,phone,gender:document.getElementById('rGender').value,dob:document.getElementById('rDob').value,email:document.getElementById('rEmail').value,occupation:document.getElementById('rOcc').value,address:document.getElementById('rAddr').value,classGroup:document.getElementById('rGroup').value,membershipStatus:document.getElementById('rStatus').value};
+    const photoUrl = await uploadPhotoIfAny('rPhoto');
+    const data={fullName:name,phone,gender:document.getElementById('rGender').value,dob:document.getElementById('rDob').value,email:document.getElementById('rEmail').value,occupation:document.getElementById('rOcc').value,address:document.getElementById('rAddr').value,classGroup:document.getElementById('rGroup').value,membershipStatus:document.getElementById('rStatus').value,maritalStatus:document.getElementById('rMarital').value,spouseName:document.getElementById('rSpouse').value,baptismDate:document.getElementById('rBaptism').value,confirmationDate:document.getElementById('rConfirm').value,previousChurch:document.getElementById('rPrevChurch').value,ghanaCardNumber:document.getElementById('rGhanaCard').value,photoUrl};
     const res = await apiPost('registerMember',{data});
     hideLoader();
     if(!res.success){err.textContent=res.error||'Registration failed. Try again.';err.style.display='block';return;}
@@ -491,7 +514,8 @@ function filterMembers(){
   renderMemberTable(list);
 }
 function renderMemberTable(list){
-  document.getElementById('memberTable').innerHTML=list.length?`<table><thead><tr><th>Name</th><th>Gender</th><th>Phone</th><th>Group</th><th>Status</th><th>Joined</th><th>SMS</th><th></th></tr></thead><tbody>${list.map(m=>`<tr>
+  document.getElementById('memberTable').innerHTML=list.length?`<table><thead><tr><th></th><th>Name</th><th>Gender</th><th>Phone</th><th>Group</th><th>Status</th><th>Joined</th><th>SMS</th><th></th></tr></thead><tbody>${list.map(m=>`<tr>
+    <td>${m.photoUrl?`<img src="${m.photoUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:`<div style="width:30px;height:30px;border-radius:50%;background:var(--light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700">${m.fullName[0]}</div>`}</td>
     <td><strong>${m.fullName}</strong></td><td>${m.gender||'—'}</td><td>${m.phone||'—'}</td><td>${m.classGroup}</td>
     <td>${sBadge(m.membershipStatus)}</td><td>${fmtD(m.joinDate)}</td>
     <td>${m.phone?`<button class="btn btn-green btn-sm" onclick="sendBdaySMS('${m.id}')" title="Send Birthday SMS">🎂</button>`:'—'}</td>
@@ -510,6 +534,10 @@ function memberFormHTML(m){
   <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fD" value="${m?m.dob:''}"></div><div class="form-group"><label>Phone</label><input id="fPh" value="${m?m.phone:''}" placeholder="0XX XXX XXXX"></div></div>
   <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m?m.email:''}" placeholder="Optional"></div><div class="form-group"><label>Occupation</label><input id="fO" value="${m?m.occupation:''}" placeholder="Occupation"></div></div>
   <div class="form-group"><label>Address</label><input id="fA" value="${m?m.address:''}" placeholder="Residential address"></div>
+  <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMar"><option ${m&&m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m&&m.maritalStatus==='Married'?'selected':''}>Married</option><option ${m&&m.maritalStatus==='Divorced'?'selected':''}>Divorced</option><option ${m&&m.maritalStatus==='Widowed'?'selected':''}>Widowed</option></select></div><div class="form-group"><label>Spouse's Name</label><input id="fSp" value="${m?m.spouseName||'':''}" placeholder="Optional"></div></div>
+  <div class="form-row"><div class="form-group"><label>Ghana Card Number</label><input id="fGh" value="${m?m.ghanaCardNumber||'':''}" placeholder="GHA-XXXXXXXXX-X"></div><div class="form-group"><label>Previous Church</label><input id="fPrev" value="${m?m.previousChurch||'':''}" placeholder="Optional"></div></div>
+  <div class="form-row"><div class="form-group"><label>Baptism Date</label><input type="date" id="fBap" value="${m?m.baptismDate||'':''}"></div><div class="form-group"><label>Confirmation Date</label><input type="date" id="fConf" value="${m?m.confirmationDate||'':''}"></div></div>
+  <div class="form-group"><label>Photo</label>${m&&m.photoUrl?`<div style="margin-bottom:0.5rem"><img src="${m.photoUrl}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border)"></div>`:''}<input type="file" id="fPhoto" accept="image/*"><div class="form-hint">${m&&m.photoUrl?'Upload a new photo to replace the current one.':'Optional'}</div></div>
   <div class="form-row"><div class="form-group"><label>Class Group</label><select id="fGr">${grps.map(g=>`<option ${m&&m.classGroup===g?'selected':''}>${g}</option>`).join('')}</select></div><div class="form-group"><label>Membership Status</label><select id="fSt">${sts.map(s=>`<option ${m&&m.membershipStatus===s?'selected':''}>${s}</option>`).join('')}</select></div></div>
   <div class="form-row"><div class="form-group"><label>Date Joined</label><input type="date" id="fJ" value="${m?m.joinDate:new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label>Username *</label><input id="fU" value="${m?m.username:''}" placeholder="Login username"></div></div>
   <div class="form-group"><label>Password${m?' (blank = keep current)':' *'}</label><input type="password" id="fP" placeholder="${m?'New password (optional)':'Set password'}"></div>
@@ -522,9 +550,12 @@ async function saveMember(id){
   if(!name||!user){toast('Name and username are required.','error');return;}
   showLoader(id?'Updating...':'Adding member...');
   try{
+    const newPhotoUrl = await uploadPhotoIfAny('fPhoto');
+    const extraFields={maritalStatus:document.getElementById('fMar').value,spouseName:document.getElementById('fSp').value,ghanaCardNumber:document.getElementById('fGh').value,previousChurch:document.getElementById('fPrev').value,baptismDate:document.getElementById('fBap').value,confirmationDate:document.getElementById('fConf').value};
     if(id){
       const ex=CACHE.members.find(m=>m.id===id);
-      const upd={...ex,fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user};
+      const upd={...ex,fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user,...extraFields};
+      if(newPhotoUrl)upd.photoUrl=newPhotoUrl;
       if(pass)upd.password=pass;
       const r=await apiPost('updateMember',{data:upd});if(!r.success)throw new Error(r.error);
       const i=CACHE.members.findIndex(m=>m.id===id);CACHE.members[i]=upd;
@@ -532,7 +563,7 @@ async function saveMember(id){
       if(!pass){toast('Password required.','error');hideLoader();return;}
       const sendSMS=document.getElementById('fSMS')?.checked;
       const action=sendSMS?'registerMember':'addMember';
-      const data={fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user,password:pass,role:'member'};
+      const data={fullName:name,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,classGroup:document.getElementById('fGr').value,membershipStatus:document.getElementById('fSt').value,joinDate:document.getElementById('fJ').value,username:user,password:pass,role:'member',photoUrl:newPhotoUrl,...extraFields};
       const r=await apiPost(action,{data});if(!r.success)throw new Error(r.error);
       data.id=r.id;CACHE.members.push(data);
     }
@@ -799,7 +830,7 @@ async function doManualBirthdayCheck(){
 function renderMyProfile(){
   const m=currentUser;
   document.getElementById('content').innerHTML=`
-    <div class="prof-hero"><div class="prof-av">${m.fullName[0]}</div><div><div class="prof-name">${m.fullName}</div><div class="prof-sub">${m.classGroup} &bull; ${m.membershipStatus} &bull; Bethel Society Jamdede</div></div></div>
+    <div class="prof-hero">${m.photoUrl?`<img src="${m.photoUrl}" style="width:66px;height:66px;border-radius:50%;object-fit:cover;flex-shrink:0">`:`<div class="prof-av">${m.fullName[0]}</div>`}<div><div class="prof-name">${m.fullName}</div><div class="prof-sub">${m.classGroup} &bull; ${m.membershipStatus} &bull; Bethel Society Jamdede</div></div></div>
     <div class="two-col">
       <div class="card"><div class="card-hdr"><div class="card-title">Personal Details</div><button class="btn btn-outline btn-sm" onclick="openEditProf()">Edit</button></div><div class="card-body"><table style="table-layout:fixed"><tbody>
         <tr><td style="color:var(--grey);font-size:0.76rem;width:40%">Full Name</td><td><strong>${m.fullName}</strong></td></tr>
@@ -809,6 +840,12 @@ function renderMyProfile(){
         <tr><td style="color:var(--grey);font-size:0.76rem">Email</td><td>${m.email||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Address</td><td>${m.address||'—'}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Occupation</td><td>${m.occupation||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Marital Status</td><td>${m.maritalStatus||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Spouse's Name</td><td>${m.spouseName||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Ghana Card No.</td><td>${m.ghanaCardNumber||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Previous Church</td><td>${m.previousChurch||'—'}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Baptism Date</td><td>${fmtD(m.baptismDate)}</td></tr>
+        <tr><td style="color:var(--grey);font-size:0.76rem">Confirmation Date</td><td>${fmtD(m.confirmationDate)}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Class Group</td><td>${m.classGroup}</td></tr>
         <tr><td style="color:var(--grey);font-size:0.76rem">Date Joined</td><td>${fmtD(m.joinDate)}</td></tr>
       </tbody></table></div></div>
@@ -827,12 +864,17 @@ function openEditProf(){
     <div class="form-row"><div class="form-group"><label>Date of Birth</label><input type="date" id="fD" value="${m.dob}"></div><div class="form-group"><label>Phone</label><input id="fPh" value="${m.phone}"></div></div>
     <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="fE" value="${m.email}"></div><div class="form-group"><label>Occupation</label><input id="fO" value="${m.occupation}"></div></div>
     <div class="form-group"><label>Address</label><input id="fA" value="${m.address}"></div>
+    <div class="form-row"><div class="form-group"><label>Marital Status</label><select id="fMar"><option ${m.maritalStatus==='Single'?'selected':''}>Single</option><option ${m.maritalStatus==='Married'?'selected':''}>Married</option><option ${m.maritalStatus==='Divorced'?'selected':''}>Divorced</option><option ${m.maritalStatus==='Widowed'?'selected':''}>Widowed</option></select></div><div class="form-group"><label>Spouse's Name</label><input id="fSp" value="${m.spouseName||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Ghana Card Number</label><input id="fGh" value="${m.ghanaCardNumber||''}"></div><div class="form-group"><label>Previous Church</label><input id="fPrev" value="${m.previousChurch||''}"></div></div>
+    <div class="form-group"><label>Photo</label>${m.photoUrl?`<div style="margin-bottom:0.5rem"><img src="${m.photoUrl}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border)"></div>`:''}<input type="file" id="fPhoto" accept="image/*"></div>
   `,[{l:'Cancel',c:'btn-grey',a:'closeModal()'},{l:'Save Changes',c:'btn-primary',a:'saveMyProf()'}]);
 }
 async function saveMyProf(){
   showLoader('Saving...');
   try{
-    const upd={...currentUser,fullName:document.getElementById('fN').value.trim()||currentUser.fullName,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value};
+    const newPhotoUrl = await uploadPhotoIfAny('fPhoto');
+    const upd={...currentUser,fullName:document.getElementById('fN').value.trim()||currentUser.fullName,gender:document.getElementById('fG').value,dob:document.getElementById('fD').value,phone:document.getElementById('fPh').value,email:document.getElementById('fE').value,occupation:document.getElementById('fO').value,address:document.getElementById('fA').value,maritalStatus:document.getElementById('fMar').value,spouseName:document.getElementById('fSp').value,ghanaCardNumber:document.getElementById('fGh').value,previousChurch:document.getElementById('fPrev').value};
+    if(newPhotoUrl)upd.photoUrl=newPhotoUrl;
     const r=await apiPost('updateMember',{data:upd});if(!r.success)throw new Error(r.error);
     currentUser=upd;const i=CACHE.members.findIndex(m=>m.id===currentUser.id);if(i>=0)CACHE.members[i]=upd;
     hideLoader();closeModal();renderMyProfile();toast('Profile updated.','success');
